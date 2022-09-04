@@ -1,0 +1,92 @@
+{
+  "uuid": "12a617ae-cbf9-438a-a694-d506d3f385b4",
+  "lastMigration": 22,
+  "name": "Undertale mock",
+  "endpointPrefix": "",
+  "latency": 0,
+  "port": 8080,
+  "hostname": "127.0.0.1",
+  "routes": [
+    {
+      "uuid": "be31f521-a1f9-4a2c-b151-31f2f553d9c8",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "getItems",
+      "responses": [
+        {
+          "uuid": "8522e2c6-41ae-49a6-9dea-ee7e276ee637",
+          "body": "{\n  \"items\": [\n    {\n      \"id\": 0,\n      \"name\": \"Empty\"\n    },\n    {\n      \"id\": 1,\n      \"name\": \"MnstrCndy\"\n    },\n    {\n      \"id\": 2,\n      \"name\": \"CroqtRoll\"\n    },\n    {\n      \"id\": 3,\n      \"name\": \"Stick\"\n    },\n    {\n      \"id\": 4,\n      \"name\": \"Bandage\"\n    },\n    {\n      \"id\": 5,\n      \"name\": \"RockCandy\"\n    },\n    {\n      \"id\": 6,\n      \"name\": \"PmknRings\"\n    },\n    {\n      \"id\": 7,\n      \"name\": \"SpdrDonut\"\n    },\n    {\n      \"id\": 8,\n      \"name\": \"Onion\"\n    },\n    {\n      \"id\": 9,\n      \"name\": \"GhstFruit\"\n    },\n    {\n      \"id\": 10,\n      \"name\": \"SpdrCider\"\n    },\n    {\n      \"id\": 11,\n      \"name\": \"Pie\"\n    },\n    {\n      \"id\": 12,\n      \"name\": \"Ribbon\"\n    },\n    {\n      \"id\": 13,\n      \"name\": \"ToyKnife\"\n    },\n    {\n      \"id\": 14,\n      \"name\": \"Glove\"\n    },\n    {\n      \"id\": 15,\n      \"name\": \"Bandanna\"\n    },\n    {\n      \"id\": 16,\n      \"name\": \"SnowPiece\"\n    },\n    {\n      \"id\": 17,\n      \"name\": \"NiceCream\"\n    },\n    {\n      \"id\": 18,\n      \"name\": \"IceCream\"\n    },\n    {\n      \"id\": 19,\n      \"name\": \"Bisicle\"\n    },\n    {\n      \"id\": 20,\n      \"name\": \"Popsicle\"\n    },\n    {\n      \"id\": 21,\n      \"name\": \"Cbun\"\n    },\n    {\n      \"id\": 22,\n      \"name\": \"TemFlakes\"\n    },\n    {\n      \"id\": 23,\n      \"name\": \"Quiche\"\n    },\n    {\n      \"id\": 24,\n      \"name\": \"Tutu\"\n    },\n    {\n      \"id\": 25,\n      \"name\": \"Shoes\"\n    },\n    {\n      \"id\": 26,\n      \"name\": \"PunchCard\"\n    },\n    {\n      \"id\": 27,\n      \"name\": \"Dog\"\n    },\n    {\n      \"id\": 28,\n      \"name\": \"DogSalad\"\n    },\n    {\n      \"id\": 29,\n      \"name\": \"DResidue1\"\n    },\n    {\n      \"id\": 30,\n      \"name\": \"DResidue2\"\n    },\n    {\n      \"id\": 31,\n      \"name\": \"DResidue3\"\n    },\n    {\n      \"id\": 32,\n      \"name\": \"DResidue4\"\n    },\n    {\n      \"id\": 33,\n      \"name\": \"DResidue5\"\n    },\n    {\n      \"id\": 34,\n      \"name\": \"DResidue6\"\n    },\n    {\n      \"id\": 35,\n      \"name\": \"AstrFood\"\n    },\n    {\n      \"id\": 36,\n      \"name\": \"INoodles\"\n    },\n    {\n      \"id\": 37,\n      \"name\": \"CrabApple\"\n    },\n    {\n      \"id\": 38,\n      \"name\": \"HotDog\"\n    },\n    {\n      \"id\": 39,\n      \"name\": \"HotCat\"\n    },\n    {\n      \"id\": 40,\n      \"name\": \"GBurger\"\n    },\n    {\n      \"id\": 41,\n      \"name\": \"SeaTea\"\n    },\n    {\n      \"id\": 42,\n      \"name\": \"Starfait\"\n    },\n    {\n      \"id\": 43,\n      \"name\": \"LHero\"\n    },\n    {\n      \"id\": 44,\n      \"name\": \"Glasses\"\n    },\n    {\n      \"id\": 45,\n      \"name\": \"Notebook\"\n    },\n    {\n      \"id\": 46,\n      \"name\": \"Apron\"\n    },\n    {\n      \"id\": 47,\n      \"name\": \"BurntPan\"\n    },\n    {\n      \"id\": 48,\n      \"name\": \"CowboyHat\"\n    },\n    {\n      \"id\": 49,\n      \"name\": \"EmptyGun\"\n    },\n    {\n      \"id\": 50,\n      \"name\": \"HLocket\"\n    },\n    {\n      \"id\": 51,\n      \"name\": \"WDagger\"\n    },\n    {\n      \"id\": 52,\n      \"name\": \"RealKnife\"\n    },\n    {\n      \"id\": 53,\n      \"name\": \"TheLocket\"\n    },\n    {\n      \"id\": 54,\n      \"name\": \"BadMemory\"\n    },\n    {\n      \"id\": 55,\n      \"name\": \"LastDream\"\n    },\n    {\n      \"id\": 56,\n      \"name\": \"Letter\"\n    },\n    {\n      \"id\": 57,\n      \"name\": \"LetterX\"\n    },\n    {\n      \"id\": 58,\n      \"name\": \"Chips\"\n    },\n    {\n      \"id\": 59,\n      \"name\": \"JunkFood\"\n    },\n    {\n      \"id\": 60,\n      \"name\": \"Key\"\n    },\n    {\n      \"id\": 61,\n      \"name\": \"Steak\"\n    },\n    {\n      \"id\": 62,\n      \"name\": \"HushPuppy\"\n    },\n    {\n      \"id\": 63,\n      \"name\": \"SnailPie\"\n    },\n    {\n      \"id\": 64,\n      \"name\": \"TemArmor\"\n    }\n  ]\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true
+        }
+      ],
+      "enabled": true,
+      "responseMode": null
+    },
+    {
+      "uuid": "9387662d-0517-4628-9d9d-e9bf556ea89d",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "getHealth",
+      "responses": [
+        {
+          "uuid": "c050156e-f739-4676-a453-807a1c3328c1",
+          "body": "{\n  \"health\": 20.0\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true
+        }
+      ],
+      "enabled": true,
+      "responseMode": null
+    }
+  ],
+  "proxyMode": false,
+  "proxyHost": "",
+  "proxyRemovePrefix": false,
+  "tlsOptions": {
+    "enabled": false,
+    "type": "CERT",
+    "pfxPath": "",
+    "certPath": "",
+    "keyPath": "",
+    "caPath": "",
+    "passphrase": ""
+  },
+  "cors": true,
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    }
+  ],
+  "proxyReqHeaders": [
+    {
+      "key": "",
+      "value": ""
+    }
+  ],
+  "proxyResHeaders": [
+    {
+      "key": "",
+      "value": ""
+    }
+  ]
+}

@@ -1,0 +1,229 @@
+{
+  "uuid": "909f582c-2c43-4521-ba06-a514df7c9f00",
+  "lastMigration": 22,
+  "name": "Tiltify mock",
+  "endpointPrefix": "api/v3",
+  "latency": 0,
+  "port": 3000,
+  "hostname": "127.0.0.1",
+  "routes": [
+    {
+      "uuid": "ce974690-9deb-486b-84ad-441fa8d6725c",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "campaigns/:id",
+      "responses": [
+        {
+          "uuid": "3685956e-6715-4df4-8944-58e0f8d301cf",
+          "body": "{\n  \"meta\": {\n    \"status\": 200\n  },\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"My Awesome Campaign\",\n    \"slug\": \"my-awesome-campaign\",\n    \"url\": \"/@username/my-awesome-campaign\",\n    \"startsAt\": 1493355600000,\n    \"endsAt\": 1496206800000,\n    \"description\": \"My awesome weekend campaign.\",\n    \"avatar\": {\n      \"src\": \"https://asdf.cloudfront.net/asdf.jpg\",\n      \"alt\": \"\",\n      \"width\": 200,\n      \"height\": 200\n    },\n    \"causeId\": 17,\n    \"fundraisingEventId\": 39,\n    \"fundraiserGoalAmount\": 10000,\n    \"originalGoalAmount\": 5000,\n    \"amountRaised\": 3402.00,\n    \"supportingAmountRaised\": 8923.00,\n    \"totalAmountRaised\": 12325.00,\n    \"supportable\": true,\n    \"status\": \"published\",\n    \"user\": {\n      \"id\": 1,\n      \"username\": \"UserName\",\n      \"slug\": \"username\",\n      \"url\": \"/@username\",\n      \"avatar\": {\n        \"src\": \"https://asdf.cloudfront.net/asdf.jpg\",\n        \"alt\": \"\",\n        \"width\": 200,\n        \"height\": 200\n      }\n    },\n    \"team\": {\n      \"id\": 1,\n      \"username\": \"Team Name\",\n      \"slug\": \"teamslug\",\n      \"url\": \"/+teamslug\",\n      \"avatar\": {\n        \"src\": \"https://asdf.cloudfront.net/asdf.jpg\",\n        \"alt\": \"\",\n        \"width\": 200,\n        \"height\": 200\n      }\n    },\n    \"livestream\": {\n      \"type\": \"twitch\",\n      \"channel\": \"tiltify\"\n    }\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "Success",
+          "headers": [],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "id",
+              "value": "1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true
+        },
+        {
+          "uuid": "c6126e1e-3b44-4f3a-8985-5e03357fb96b",
+          "body": "{\n    \"meta\": {\n        \"status\": 404\n    },\n    \"error\": {\n        \"title\": \"Not Found - (Campaign)\",\n        \"detail\": \"Campaign with an id of {{ urlParam 'id' }} could not be found.\"\n    }\n}",
+          "latency": 0,
+          "statusCode": 404,
+          "label": "Campaign not found",
+          "headers": [],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "id",
+              "value": "1",
+              "invert": true,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false
+        }
+      ],
+      "enabled": true,
+      "responseMode": null
+    },
+    {
+      "uuid": "2d4286fe-67a4-4324-9954-29904088fd40",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "campaigns/:id/donations",
+      "responses": [
+        {
+          "uuid": "90e990f1-a90c-4061-a5ac-cd943dc71f2d",
+          "body": "{\n  \"meta\": {\n    \"status\": 200\n  },\n  \"data\": [\n    {\n      \"id\": 21347,\n      \"amount\": 4.20,\n      \"name\": \"Yoda\",\n      \"comment\": \"Judge me by my size, do you?\",\n      \"completedAt\": 1490328000000,\n      \"rewardId\": 1\n    },\n    {\n      \"id\": 21342,\n      \"amount\": 1.00,\n      \"name\": \"Me\",\n      \"comment\": \"This is an easy Game\",\n      \"completedAt\": 1490327800000\n    }\n  ],\n  \"links\": {\n    \"prev\": \"\",\n    \"next\": \"\",\n    \"self\": \"\"\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "Donations",
+          "headers": [],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "request_number",
+              "modifier": "",
+              "value": "1",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true
+        },
+        {
+          "uuid": "89d300e4-6d97-4756-add0-ceef8a6aa4b8",
+          "body": "{\n  \"meta\": {\n    \"status\": 200\n  },\n  \"data\": [],\n  \"links\": {\n    \"prev\": \"\",\n    \"next\": \"\",\n    \"self\": \"\"\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "No more donations",
+          "headers": [],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "request_number",
+              "modifier": "",
+              "value": "1",
+              "invert": true,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false
+        }
+      ],
+      "enabled": true,
+      "responseMode": null
+    },
+    {
+      "uuid": "d205752f-c071-4310-b59c-1cda6a770050",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "campaigns/:id/rewards",
+      "responses": [
+        {
+          "uuid": "9c9d8b75-3728-4d24-807b-9ec22b9f7f5f",
+          "body": "{\n  \"meta\": {\n    \"status\": 200\n  },\n  \"data\": [\n    {\n      \"id\": 1,\n      \"name\": \"Fingerstache vhs paleo tattooed echo cold-pressed.\",\n      \"description\": \"Chuck Norris can access the DB from the UI.\",\n      \"amount\": 43,\n      \"kind\": \"virtual\",\n      \"quantity\": null,\n      \"remaining\": null,\n      \"fairMarketValue\": 88,\n      \"currency\": \"USD\",\n      \"shippingAddressRequired\": false,\n      \"shippingNote\": null,\n      \"image\": {\n        \"src\": \"\",\n        \"alt\": \"Chuck Norris can access the DB from the UI.\",\n        \"width\": 270,\n        \"height\": 176\n      },\n      \"active\": true,\n      \"startsAt\": 0,\n      \"createdAt\": 1498169329000,\n      \"updatedAt\": 1498249889000\n    }\n  ]\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true
+        }
+      ],
+      "enabled": true,
+      "responseMode": null
+    },
+    {
+      "uuid": "77e0c7f1-adea-47a8-9f70-451ee4590837",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "user",
+      "responses": [
+        {
+          "uuid": "a6fccf74-dc6a-40a6-97cd-c63e1ace8515",
+          "body": "{\n  \"meta\": {\n    \"status\": 200\n  },\n  \"data\": {\n    \"id\": 3,\n    \"username\": \"TiltifyUser\",\n    \"slug\": \"tiltify-user\",\n    \"thumbnail\": {\n      \"src\": \"https://asdf.cloudfront.net/asdf.jpg\",\n      \"alt\": \"synthesize distributed solutions\",\n      \"width\": 200,\n      \"height\": 200\n    },\n    \"status\": \"completed\"\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true
+        }
+      ],
+      "enabled": true,
+      "responseMode": null
+    },
+    {
+      "uuid": "2347912c-707e-489d-8fb2-17082819e3a8",
+      "documentation": "",
+      "method": "get",
+      "endpoint": "users/:id/campaigns",
+      "responses": [
+        {
+          "uuid": "d2f0e12d-e0c2-4253-83d4-edc41cce79b0",
+          "body": "{\n    \"meta\": {\n        \"status\": 200\n    },\n    \"data\": [\n        {\n    \"id\": 1,\n    \"name\": \"My Awesome Campaign\",\n    \"slug\": \"my-awesome-campaign\",\n    \"url\": \"/@username/my-awesome-campaign\",\n    \"startsAt\": 1493355600000,\n    \"endsAt\": 1496206800000,\n    \"description\": \"My awesome weekend campaign.\",\n    \"avatar\": {\n      \"src\": \"https://asdf.cloudfront.net/asdf.jpg\",\n      \"alt\": \"\",\n      \"width\": 200,\n      \"height\": 200\n    },\n    \"causeId\": 17,\n    \"fundraisingEventId\": 39,\n    \"fundraiserGoalAmount\": 10000,\n    \"originalGoalAmount\": 5000,\n    \"amountRaised\": 3402.00,\n    \"supportingAmountRaised\": 8923.00,\n    \"totalAmountRaised\": 12325.00,\n    \"supportable\": true,\n    \"status\": \"published\",\n    \"user\": {\n      \"id\": 1,\n      \"username\": \"UserName\",\n      \"slug\": \"username\",\n      \"url\": \"/@username\",\n      \"avatar\": {\n        \"src\": \"https://asdf.cloudfront.net/asdf.jpg\",\n        \"alt\": \"\",\n        \"width\": 200,\n        \"height\": 200\n      }\n    },\n    \"team\": {\n      \"id\": 1,\n      \"username\": \"Team Name\",\n      \"slug\": \"teamslug\",\n      \"url\": \"/+teamslug\",\n      \"avatar\": {\n        \"src\": \"https://asdf.cloudfront.net/asdf.jpg\",\n        \"alt\": \"\",\n        \"width\": 200,\n        \"height\": 200\n      }\n    },\n    \"livestream\": {\n      \"type\": \"twitch\",\n      \"channel\": \"tiltify\"\n    }\n  }\n    ]\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true
+        }
+      ],
+      "enabled": true,
+      "responseMode": null
+    }
+  ],
+  "proxyMode": false,
+  "proxyHost": "",
+  "proxyRemovePrefix": false,
+  "tlsOptions": {
+    "enabled": false,
+    "type": "CERT",
+    "pfxPath": "",
+    "certPath": "",
+    "keyPath": "",
+    "caPath": "",
+    "passphrase": ""
+  },
+  "cors": true,
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    }
+  ],
+  "proxyReqHeaders": [
+    {
+      "key": "",
+      "value": ""
+    }
+  ],
+  "proxyResHeaders": [
+    {
+      "key": "",
+      "value": ""
+    }
+  ]
+}
