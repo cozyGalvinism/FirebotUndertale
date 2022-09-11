@@ -121,7 +121,7 @@ class TiltifyIntegration extends EventEmitter implements IntegrationController {
         this.timeout = setInterval(async () => {
             var lastId: number;
             try {
-                lastId = db.getData("/tiltify/lastId");
+                lastId = db.getData(`/tiltify/${campaignId}/lastId`);
             } catch (e) {
                 lastId = -1;
             }
@@ -158,7 +158,7 @@ class TiltifyIntegration extends EventEmitter implements IntegrationController {
                 });
             });
 
-            db.push("/tiltify/lastId", lastId);
+            db.push(`/tiltify/${campaignId}/lastId`, lastId);
             
         }, (integrationData.userSettings.integrationSettings.pollInterval as number) * 1000);
 
@@ -263,7 +263,7 @@ function register(runRequest: RunRequest) {
     runRequest.modules.eventManager.registerEventSource(eventSourceDefinition);
     runRequest.modules.eventFilterManager.registerFilter(RewardFilter);
     runRequest.modules.frontendCommunicator.fireEventAsync("integrationsUpdated", {});
-    
+
     runRequest.modules.frontendCommunicator.onAsync("get-tiltify-rewards", () => {
         let integration = runRequest.modules.integrationManager.getIntegrationDefinitionById("tiltify");
         if (integration == null || integration.userSettings == null || integration.userSettings.campaignSettings == null || integration.userSettings.campaignSettings.campaignId == null || integration.userSettings.campaignSettings.campaignId === "") {
