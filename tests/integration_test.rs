@@ -3,7 +3,7 @@ use tput_proc::mem_value_structs;
 use serde::{Deserialize, Serialize};
 use pretty_assertions::assert_eq;
 
-#[derive(Deserialize)]
+#[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FillInventoryBody {
     pub item: u8,
@@ -11,23 +11,23 @@ pub struct FillInventoryBody {
     pub only_empty_slots: bool,
 }
 
-#[derive(Deserialize)]
+#[derive(Serialize)]
 pub struct GetInventoryBody {
     pub slot: usize,
 }
 
-#[derive(Serialize)]
+#[derive(Deserialize)]
 pub struct ItemModel {
     pub id: u8,
     pub name: String,
 }
 
-#[derive(Serialize)]
+#[derive(Deserialize)]
 pub struct GetItemsResponse {
     pub items: Vec<ItemModel>,
 }
 
-#[derive(Serialize)]
+#[derive(Deserialize)]
 pub struct GetInventoryResponse {
     pub item: u8,
 }
@@ -187,6 +187,40 @@ async fn test_get_equipped_armor() -> Result<(), ()> {
         .await
         .unwrap();
     pretty_assertions::assert_eq!(res.equipped_armor, 4.0);
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_inventory() -> Result<(), ()> {
+    dotenv::dotenv().ok();
+
+    let port = std::env::var("PORT").unwrap_or_else(|_| "1337".to_string());
+    let client = setup();
+    client.post(&format!("http://localhost:{}/fillInventory", port))
+        .json(&FillInventoryBody {
+            item: 29,
+            only_empty_slots: true,
+            overwrite_important_items: false
+        })
+        .send()
+        .await
+        .unwrap()
+        .error_for_status()
+        .unwrap();
+    
+    let res = client.post(&format!("http://localhost:{}/getInventory", port))
+        .json(&GetInventoryBody {
+            slot: 1
+        })
+        .send()
+        .await
+        .unwrap()
+        .json::<GetInventoryResponse>()
+        .await
+        .unwrap();
+    
+    pretty_assertions::assert_eq!(res.item, 29);
 
     Ok(())
 }
