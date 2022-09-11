@@ -47,7 +47,7 @@ fn fill_inventory_with(process: &ProcessMemory, item: Item, overwrite_important_
     for slot in 0..INVENTORY_OFFSETS.len() {
         let inventory_item = get_inventory_item(process, slot);
         if let Some(inventory_item) = inventory_item {
-            if overwrite_important_items && inventory_item.is_important_item() {
+            if !overwrite_important_items && inventory_item.is_important_item() {
                 continue;
             }
 
@@ -55,6 +55,8 @@ fn fill_inventory_with(process: &ProcessMemory, item: Item, overwrite_important_
                 continue;
             }
             set_inventory_item(process, slot, item);
+        } else {
+            tracing::warn!("Failed to get inventory item at slot {}", slot);
         }
     }
 }
