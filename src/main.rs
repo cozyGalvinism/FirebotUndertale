@@ -52,12 +52,12 @@ fn fill_inventory_with(process: &ProcessMemory, item: Item, overwrite_important_
         let inventory_item = get_inventory_item(process, slot);
         if let Some(inventory_item) = inventory_item {
             if !overwrite_important_items && inventory_item.is_important_item() {
-                tracing::info!("Not overwriting important item {}", inventory_item);
+                tracing::debug!("Not overwriting important item {}", inventory_item);
                 continue;
             }
 
             if only_empty_slots && !matches!(inventory_item, Item::Empty) {
-                tracing::info!("Not overwriting non-empty slot {}", inventory_item);
+                tracing::debug!("Not overwriting non-empty slot {}", inventory_item);
                 continue;
             }
             set_inventory_item(process, slot, item);
