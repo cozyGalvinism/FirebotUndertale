@@ -68,7 +68,7 @@ async fn test_get_kill_areas() -> Result<(), ()> {
 }
 
 #[tokio::test]
-async fn test_set_health() -> Result<(), ()> {
+async fn test_health() -> Result<(), ()> {
     dotenv::dotenv().ok();
 
     let port = std::env::var("PORT").unwrap_or_else(|_| "1337".to_string());
@@ -80,16 +80,7 @@ async fn test_set_health() -> Result<(), ()> {
         .unwrap()
         .error_for_status()
         .unwrap();
-
-    Ok(())
-}
-
-#[tokio::test]
-async fn test_get_health() -> Result<(), ()> {
-    dotenv::dotenv().ok();
-
-    let port = std::env::var("PORT").unwrap_or_else(|_| "1337".to_string());
-    let client = setup();
+    
     let res = client.get(&format!("http://localhost:{}/getHealth", port))
         .send()
         .await
@@ -97,7 +88,7 @@ async fn test_get_health() -> Result<(), ()> {
         .json::<GetHealthResponse>()
         .await
         .unwrap();
-    pretty_assertions::assert_eq!(res.health > 0.0, true);
+    pretty_assertions::assert_eq!(res.health, 10.0);
 
     Ok(())
 }
@@ -121,7 +112,7 @@ async fn test_get_max_health() -> Result<(), ()> {
 }
 
 #[tokio::test]
-async fn test_set_gold() -> Result<(), ()> {
+async fn test_gold() -> Result<(), ()> {
     dotenv::dotenv().ok();
 
     let port = std::env::var("PORT").unwrap_or_else(|_| "1337".to_string());
@@ -133,16 +124,7 @@ async fn test_set_gold() -> Result<(), ()> {
         .unwrap()
         .error_for_status()
         .unwrap();
-
-    Ok(())
-}
-
-#[tokio::test]
-async fn test_get_gold() -> Result<(), ()> {
-    dotenv::dotenv().ok();
-
-    let port = std::env::var("PORT").unwrap_or_else(|_| "1337".to_string());
-    let client = setup();
+    
     let res = client.get(&format!("http://localhost:{}/getGold", port))
         .send()
         .await
@@ -150,7 +132,7 @@ async fn test_get_gold() -> Result<(), ()> {
         .json::<GetGoldResponse>()
         .await
         .unwrap();
-    pretty_assertions::assert_eq!(res.gold >= 0.0, true);
+    pretty_assertions::assert_eq!(res.gold, 10.0);
 
     Ok(())
 }
@@ -223,4 +205,28 @@ async fn test_inventory() -> Result<(), ()> {
     pretty_assertions::assert_eq!(res.item, 29);
 
     Ok(())
+}
+
+#[tokio::test]
+async fn test_encounter_counter() {
+    dotenv::dotenv().ok();
+
+    let port = std::env::var("PORT").unwrap_or_else(|_| "1337".to_string());
+    let client = setup();
+    client.post(&format!("http://localhost:{}/setEncounter", port))
+        .json(&SetEncounterCounterRequest { encounter_counter: 9999.0 })
+        .send()
+        .await
+        .unwrap()
+        .error_for_status()
+        .unwrap();
+    
+    let res = client.get(&format!("http://localhost:{}/getEncounter", port))
+        .send()
+        .await
+        .unwrap()
+        .json::<GetEncounterCounterResponse>()
+        .await
+        .unwrap();
+    pretty_assertions::assert_eq!(res.encounter_counter, 9999.0);
 }
