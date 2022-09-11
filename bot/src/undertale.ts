@@ -23,7 +23,7 @@ const SetHealthEffect: Firebot.EffectType<{
     },
     optionsTemplate: `
         <eos-container header="New Health">
-            <input type="number" class="form-control" ng-model="effect.newHealth" placeholder="20" replace-variables menu-position="below" />
+            <input type="text" class="form-control" ng-model="effect.newHealth" placeholder="20" replace-variables menu-position="below" />
         </eos-container>
     `,
     optionsController: () => { },
@@ -104,7 +104,7 @@ const SetGoldEffect: Firebot.EffectType<{
     },
     optionsTemplate: `
         <eos-container header="New Gold">
-            <input type="number" class="form-control" ng-model="effect.newGold" placeholder="100" replace-variables menu-position="below" />
+            <input type="text" class="form-control" ng-model="effect.newGold" placeholder="100" replace-variables menu-position="below" />
         </eos-container>
     `,
     optionsController: () => { },
@@ -160,7 +160,7 @@ const GetInventorySlotEffect: Firebot.EffectType<{
     },
     optionsTemplate: `
         <eos-container header="Slot">
-            <input type="number" class="form-control" ng-model="effect.slot" placeholder="1" replace-variables menu-position="below" />
+            <input type="text" class="form-control" ng-model="effect.slot" placeholder="1" replace-variables menu-position="below" />
         </eos-container>
         <eos-container header="Item Variable" pad-top="true">
             <input type="text" class="form-control" ng-model="effect.variableName" placeholder="item" replace-variables menu-position="below" />
@@ -196,7 +196,7 @@ const SetEncounterCounterEffect: Firebot.EffectType<{
     },
     optionsTemplate: `
         <eos-container header="New Encounter Counter">
-            <input type="number" class="form-control" ng-model="effect.newEncounterCounter" placeholder="0" replace-variables menu-position="below" />
+            <input type="text" class="form-control" ng-model="effect.newEncounterCounter" placeholder="0" replace-variables menu-position="below" />
         </eos-container>
     `,
     optionsController: () => { },
@@ -225,7 +225,7 @@ const SetSpeedEffect: Firebot.EffectType<{
     },
     optionsTemplate: `
         <eos-container header="New Speed">
-            <input type="number" class="form-control" ng-model="effect.newSpeed" placeholder="100" replace-variables menu-position="below" />
+            <input type="text" class="form-control" ng-model="effect.newSpeed" placeholder="100" replace-variables menu-position="below" />
         </eos-container>
     `,
     optionsController: () => { },
@@ -520,7 +520,7 @@ const SetKillsEffect: Firebot.EffectType<{
     },
     optionsTemplate: `
         <eos-container header="New Kills">
-            <input type="number" class="form-control" ng-model="effect.newKills" placeholder="0" />
+            <input type="text" class="form-control" ng-model="effect.newKills" placeholder="0" />
         </eos-container>
     `,
     optionsController: () => { },
