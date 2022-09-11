@@ -39,9 +39,8 @@ fn set_inventory_item(process: &ProcessMemory, slot: usize, item: Item) {
         return;
     }
     let inventory_address = inventory_address(process, slot);
-    tracing::debug!("Setting inventory item at slot {} to {} ({}) at address {:X}", slot, item, num_traits::ToPrimitive::to_f64(&item).unwrap(), inventory_address);
     let item_bytes = num_traits::ToPrimitive::to_f64(&item).unwrap().to_le_bytes().to_vec();
-    process.write_memory(inventory_address, &item_bytes, true);
+    process.write_memory(inventory_address, &item_bytes, false);
 }
 
 fn fill_inventory_with(process: &ProcessMemory, item: Item, overwrite_important_items: bool, only_empty_slots: bool) {
