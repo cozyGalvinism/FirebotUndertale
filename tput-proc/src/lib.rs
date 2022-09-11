@@ -101,3 +101,35 @@ pub fn mem_value(item: TokenStream) -> TokenStream {
 
     output
 }
+
+#[proc_macro]
+pub fn mem_value_structs(item: TokenStream) -> TokenStream {
+    // mem_value_structs!(health, f64)
+    let item = item.to_string();
+    let mut item = item.split_terminator(',');
+    let name_str = item.next().unwrap().trim();
+    let value_type_str = item.next().unwrap().trim();
+
+    let response_struct_name_str = format!("get_{}_response", name_str).to_case(convert_case::Case::UpperCamel);
+    let response_struct_name = syn::Ident::new(&response_struct_name_str, proc_macro2::Span::call_site());
+    let request_struct_name_str = format!("set_{}_request", name_str).to_case(convert_case::Case::UpperCamel);
+    let request_struct_name = syn::Ident::new(&request_struct_name_str, proc_macro2::Span::call_site());
+    let variable_name = syn::Ident::new(name_str, proc_macro2::Span::call_site());
+    let value_type = syn::Type::Verbatim(syn::parse_str(value_type_str).unwrap());
+
+    let output = quote::quote!{
+        #[derive(serde::Deserialize)]
+        #[serde(rename_all = "camelCase")]
+        struct #response_struct_name {
+            #variable_name: #value_type
+        }
+
+        #[derive(serde::Serialize)]
+        #[serde(rename_all = "camelCase")]
+        struct #request_struct_name {
+            #variable_name: #value_type
+        }
+    }.into();
+
+    output
+}
