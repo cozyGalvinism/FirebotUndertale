@@ -12,7 +12,7 @@ type UndertaleItem = {
 };
 
 const SetHealthEffect: Firebot.EffectType<{
-    newHealth: number;
+    newHealth: string;
 }> = {
     definition: {
         id: "tcu:set-health",
@@ -28,16 +28,16 @@ const SetHealthEffect: Firebot.EffectType<{
     `,
     optionsController: () => { },
     optionsValidator: (effect) => {
-        if (effect.newHealth < 0) {
+        const newHealth = parseFloat(effect.newHealth);
+        if (newHealth < 0) {
             return ["Health must be greater than or equal to 0."];
         }
         return [];
     },
     onTriggerEvent: async ({ effect }) => {
-        console.log("newHealth is a " + typeof effect.newHealth + " and contains " + effect.newHealth);
-        // await axios.post(`http://localhost:${SERVER_PORT}/setHealth`, {
-        //     health: effect.newHealth
-        // });
+        await axios.post(`http://localhost:${SERVER_PORT}/setHealth`, {
+            health: parseFloat(effect.newHealth)
+        });
     }
 };
 
@@ -94,7 +94,7 @@ const GetMaxHealthEffect: Firebot.EffectType<{
 };
 
 const SetGoldEffect: Firebot.EffectType<{
-    newGold: number;
+    newGold: string;
 }> = {
     definition: {
         id: "tcu:set-gold",
@@ -110,14 +110,14 @@ const SetGoldEffect: Firebot.EffectType<{
     `,
     optionsController: () => { },
     optionsValidator: (effect) => {
-        if (effect.newGold < 0) {
+        if (parseFloat(effect.newGold) < 0) {
             return ["Gold must be greater than or equal to 0."];
         }
         return [];
     },
     onTriggerEvent: async ({ effect }) => {
         await axios.post(`http://localhost:${SERVER_PORT}/setGold`, {
-            gold: effect.newGold
+            gold: parseFloat(effect.newGold)
         });
     }
 };
@@ -186,7 +186,7 @@ const GetInventorySlotEffect: Firebot.EffectType<{
 };
 
 const SetEncounterCounterEffect: Firebot.EffectType<{
-    newEncounterCounter: number;
+    newEncounterCounter: string;
 }> = {
     definition: {
         id: "tcu:set-encounter-counter",
@@ -202,20 +202,20 @@ const SetEncounterCounterEffect: Firebot.EffectType<{
     `,
     optionsController: () => { },
     optionsValidator: (effect) => {
-        if (effect.newEncounterCounter < 0) {
+        if (parseFloat(effect.newEncounterCounter) < 0) {
             return ["Encounter counter must be greater than or equal to 0."];
         }
         return [];
     },
     onTriggerEvent: async ({ effect }) => {
         await axios.post(`http://localhost:${SERVER_PORT}/setEncounter`, {
-            encounterCounter: effect.newEncounterCounter
+            encounterCounter: parseFloat(effect.newEncounterCounter)
         });
     }
 };
 
 const SetSpeedEffect: Firebot.EffectType<{
-    newSpeed: number;
+    newSpeed: string;
 }> = {
     definition: {
         id: "tcu:set-speed",
@@ -231,14 +231,14 @@ const SetSpeedEffect: Firebot.EffectType<{
     `,
     optionsController: () => { },
     optionsValidator: (effect) => {
-        if (effect.newSpeed < 0) {
+        if (parseFloat(effect.newSpeed) < 0) {
             return ["Speed must be greater than or equal to 0."];
         }
         return [];
     },
     onTriggerEvent: async ({ effect }) => {
         await axios.post(`http://localhost:${SERVER_PORT}/setSpeed`, {
-            speed: effect.newSpeed
+            speed: parseFloat(effect.newSpeed)
         });
     }
 };
@@ -322,7 +322,7 @@ const GetEquippedWeaponEffect: Firebot.EffectType<{
 };
 
 const SetEquippedWeaponEffect: Firebot.EffectType<{
-    newWeapon: number
+    newWeapon: string
 }> = {
     definition: {
         id: "tcu:set-equipped-weapon",
@@ -356,14 +356,14 @@ const SetEquippedWeaponEffect: Firebot.EffectType<{
                 if (items) {
                     $scope.items = items;
                     if ($scope.effect.newWeapon) {
-                        $scope.selectedItem = ($scope.items as UndertaleItem[]).find(i => i.id === $scope.effect.newWeapon);
+                        $scope.selectedItem = ($scope.items as UndertaleItem[]).find(i => i.id === parseInt($scope.effect.newWeapon));
                     }
                 }
             });
         
         $scope.itemSelected = (item: UndertaleItem) => {
             if (item) {
-                $scope.effect.newWeapon = item.id;
+                $scope.effect.newWeapon = item.id.toString();
             }
         };
     },
@@ -402,7 +402,7 @@ const GetEquippedArmorEffect: Firebot.EffectType<{
 };
 
 const SetEquippedArmorEffect: Firebot.EffectType<{
-    newArmor: number
+    newArmor: string
 }> = {
     definition: {
         id: "tcu:set-equipped-armor",
@@ -436,14 +436,14 @@ const SetEquippedArmorEffect: Firebot.EffectType<{
                 if (items) {
                     $scope.items = items;
                     if ($scope.effect.newArmor) {
-                        $scope.selectedItem = ($scope.items as UndertaleItem[]).find(i => i.id === $scope.effect.newArmor);
+                        $scope.selectedItem = ($scope.items as UndertaleItem[]).find(i => i.id === parseInt($scope.effect.newArmor));
                     }
                 }
             });
 
         $scope.itemSelected = (item: UndertaleItem) => {
             if (item) {
-                $scope.effect.newArmor = item.id;
+                $scope.effect.newArmor = item.id.toString();
             }
         };
     },
@@ -510,7 +510,7 @@ const GetKillsEffect: Firebot.EffectType<{
 };
 
 const SetKillsEffect: Firebot.EffectType<{
-    newKills: number
+    newKills: string
 }> = {
     definition: {
         id: "tcu:set-kills",
@@ -536,32 +536,32 @@ const SetKillsEffect: Firebot.EffectType<{
         if (killArea == 202) {
             // ruins
             await axios.post(`http://localhost:${SERVER_PORT}/setKillsRuins`, {
-                killsRuins: effect.newKills
+                killsRuins: parseFloat(effect.newKills)
             });
         }
         else if (killArea == 203) {
             // snowdin
             await axios.post(`http://localhost:${SERVER_PORT}/setKillsSnowdin`, {
-                killsSnowdin: effect.newKills
+                killsSnowdin: parseFloat(effect.newKills)
             });
         }
         else if (killArea == 204) {
             // waterfall
             await axios.post(`http://localhost:${SERVER_PORT}/setKillsWaterfall`, {
-                killsWaterfall: effect.newKills
+                killsWaterfall: parseFloat(effect.newKills)
             });
         }
         else if (killArea == 205) {
             // hotland
             await axios.post(`http://localhost:${SERVER_PORT}/setKillsHotland`, {
-                killsHotland: effect.newKills
+                killsHotland: parseFloat(effect.newKills)
             });
         }
     }
 };
 
 const FillInventoryEffect: Firebot.EffectType<{
-    item: number,
+    item: string,
     overwriteImportantItems: boolean,
     onlyEmptySlots: boolean
 }> = {
@@ -609,21 +609,21 @@ const FillInventoryEffect: Firebot.EffectType<{
                 if (items) {
                     $scope.items = items;
                     if ($scope.effect.item) {
-                        $scope.selectedItem = ($scope.items as UndertaleItem[]).find(i => i.id === $scope.effect.item);
+                        $scope.selectedItem = ($scope.items as UndertaleItem[]).find(i => i.id === parseInt($scope.effect.item));
                     }
                 }
             });
         
         $scope.itemSelected = (item: UndertaleItem) => {
             if (item) {
-                $scope.effect.item = item.id;
+                $scope.effect.item = item.id.toString();
             }
         };
     },
     optionsValidator: (effect) => { return []; },
     onTriggerEvent: async ({effect}) => {
         await axios.post(`http://localhost:${SERVER_PORT}/fillInventory`, {
-            item: effect.item,
+            item: parseInt(effect.item),
             overwriteImportantItems: effect.overwriteImportantItems,
             onlyEmptySlots: effect.onlyEmptySlots
         });
