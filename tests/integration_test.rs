@@ -164,7 +164,7 @@ async fn test_get_equipped_weapon() -> Result<(), ()> {
         .json::<GetEquippedWeaponResponse>()
         .await
         .unwrap();
-    pretty_assertions::assert_eq!(res.equipped_weapon, 0.0);
+    pretty_assertions::assert_eq!(res.equipped_weapon, 3.0);
 
     Ok(())
 }
@@ -182,7 +182,7 @@ async fn test_get_equipped_armor() -> Result<(), ()> {
         .json::<GetEquippedArmorResponse>()
         .await
         .unwrap();
-    pretty_assertions::assert_eq!(res.equipped_armor, 0.0);
+    pretty_assertions::assert_eq!(res.equipped_armor, 4.0);
 
     Ok(())
 }
