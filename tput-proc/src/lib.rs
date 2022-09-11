@@ -86,6 +86,7 @@ pub fn mem_value(item: TokenStream) -> TokenStream {
             }
 
             #[derive(serde::Serialize)]
+            #[serde(rename_all = "camelCase")]
             struct #response_struct_name {
                 #variable_name: #value_type
             }

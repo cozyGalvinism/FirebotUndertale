@@ -113,7 +113,7 @@ async fn test_get_max_health() -> Result<(), ()> {
         .json::<GetMaxHealthResponse>()
         .await
         .unwrap();
-    pretty_assertions::assert_eq!(res.max_health, 10.0);
+    pretty_assertions::assert_eq!(res.max_health, 20.0);
 
     Ok(())
 }
