@@ -14,6 +14,8 @@
 // Slot 6: [[[[[[["Undertale.exe"+0040894C]+44]+10]+B20]+20]+24]+14]+50
 // Slot 7: [[[[[[["Undertale.exe"+0040894C]+44]+10]+B20]+20]+24]+14]+60
 // Slot 8: [[[[[[["Undertale.exe"+0040894C]+44]+10]+B20]+20]+24]+14]+70
+// Equipped Weapon: double [[[["UNDERTALE.exe"+0040894C]+44]+10]+F4]+150
+// Equipped Armor: double [[[[[[["UNDERTALE.exe"+0040861C]+0]+68]+C]+220]+14]+48]+10
 //
 // Kill Area: double [[[[[[["UNDERTALE.exe"+40894C]+44]+10]+A0]+0]+24]+4]+C80
 // Kills Ruins: double [[[[[[["UNDERTALE.exe"+40894C]+44]+10]+A0]+0]+24]+4]+CA0
@@ -51,10 +53,9 @@ pub const INVENTORY_SLOT_7_OFFSETS: [usize; 8] =
     [0x0040894c, 0x44, 0x10, 0xB20, 0x20, 0x24, 0x14, 0x60];
 pub const INVENTORY_SLOT_8_OFFSETS: [usize; 8] =
     [0x0040894c, 0x44, 0x10, 0xB20, 0x20, 0x24, 0x14, 0x70];
-pub const EQUIPPED_WEAPON_OFFSETS: [usize; 7] = 
-    [0x003f9f44, 0x6c, 0x164, 0x44, 0x10, 0x16c, 0x4c0];
+pub const EQUIPPED_WEAPON_OFFSETS: [usize; 5] = [0x0040894c, 0x44, 0x10, 0xf4, 0x150];
 pub const EQUIPPED_ARMOR_OFFSETS: [usize; 8] =
-    [0x003f9f44, 0x6c, 0x164, 0x160, 0x44, 0x10, 0x4, 0x550];
+    [0x0040861c, 0x0, 0x68, 0xc, 0x220, 0x14, 0x48, 0x10];
 
 pub const KILL_AREA_OFFSETS: [usize; 8] = [0x0040894c, 0x44, 0x10, 0xa0, 0x0, 0x24, 0x4, 0xc80];
 pub const KILLS_RUINS_OFFSETS: [usize; 8] = [0x0040894c, 0x44, 0x10, 0xa0, 0x0, 0x24, 0x4, 0xca0];
