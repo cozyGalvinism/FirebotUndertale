@@ -36,22 +36,25 @@ pub fn mem_value(item: TokenStream) -> TokenStream {
     
             fn #get_func_name(process: &vmemory::ProcessMemory) -> #value_type {
                 let address = #address_func_name(process);
-                #value_type::from_le_bytes(process.read_memory(address, 8, false).try_into().unwrap())
+                let value = #value_type::from_le_bytes(process.read_memory(address, 8, false).try_into().unwrap());
+                tracing::info!("Read value {} from address {:x} ({})", value, address, stringify!(#get_func_name));
+                value
             }
     
             fn #set_func_name(process: &vmemory::ProcessMemory, value: #value_type) {
                 let address = #address_func_name(process);
                 let bytes = value.to_le_bytes().to_vec();
                 process.write_memory(address, &bytes, false);
+                tracing::info!("Wrote value {} to address {:x} ({})", value, address, stringify!(#set_func_name));
             }
 
-            #[derive(serde::Serialize)]
+            #[derive(serde::Serialize, Debug)]
             #[serde(rename_all = "camelCase")]
             struct #response_struct_name {
                 #variable_name: #value_type
             }
 
-            #[derive(serde::Deserialize)]
+            #[derive(serde::Deserialize, Debug)]
             #[serde(rename_all = "camelCase")]
             struct #request_struct_name {
                 #variable_name: #value_type
@@ -82,10 +85,12 @@ pub fn mem_value(item: TokenStream) -> TokenStream {
     
             fn #get_func_name(process: &vmemory::ProcessMemory) -> #value_type {
                 let address = #address_func_name(process);
-                #value_type::from_le_bytes(process.read_memory(address, 8, false).try_into().unwrap())
+                let value = #value_type::from_le_bytes(process.read_memory(address, 8, false).try_into().unwrap());
+                tracing::info!("Read value {} from address {:x} ({})", value, address, stringify!(#get_func_name));
+                value
             }
 
-            #[derive(serde::Serialize)]
+            #[derive(serde::Serialize, Debug)]
             #[serde(rename_all = "camelCase")]
             struct #response_struct_name {
                 #variable_name: #value_type

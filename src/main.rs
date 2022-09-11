@@ -30,8 +30,10 @@ fn get_inventory_item(process: &ProcessMemory, slot: usize) -> Option<Item> {
     }
     let inventory_address = inventory_address(process, slot);
     let item_bytes = process.read_memory(inventory_address, 8, false);
+    let value = f64::from_le_bytes(item_bytes.try_into().unwrap());
+    tracing::info!("Read value {} from address {:x} (get_inventory_item, slot {})", value, inventory_address, slot);
 
-    num_traits::FromPrimitive::from_f64(f64::from_le_bytes(item_bytes.try_into().unwrap()))
+    num_traits::FromPrimitive::from_f64(value)
 }
 
 fn set_inventory_item(process: &ProcessMemory, slot: usize, item: Item) {
@@ -39,16 +41,16 @@ fn set_inventory_item(process: &ProcessMemory, slot: usize, item: Item) {
         return;
     }
     let inventory_address = inventory_address(process, slot);
-    let item_bytes = num_traits::ToPrimitive::to_f64(&item).unwrap().to_le_bytes().to_vec();
+    let value = num_traits::ToPrimitive::to_f64(&item).unwrap();
+    let item_bytes = value.to_le_bytes().to_vec();
     process.write_memory(inventory_address, &item_bytes, false);
+    tracing::info!("Wrote value {} to address {:x} (set_inventory_item, slot {})", value, inventory_address, slot);
 }
 
 fn fill_inventory_with(process: &ProcessMemory, item: Item, overwrite_important_items: bool, only_empty_slots: bool) {
     for slot in 0..INVENTORY_OFFSETS.len() {
         let inventory_item = get_inventory_item(process, slot);
         if let Some(inventory_item) = inventory_item {
-            tracing::info!("Filling inventory slot {} with item {} (was {})", slot, item, inventory_item);
-
             if !overwrite_important_items && inventory_item.is_important_item() {
                 tracing::info!("Not overwriting important item {}", inventory_item);
                 continue;
