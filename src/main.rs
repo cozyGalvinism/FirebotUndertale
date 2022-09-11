@@ -29,7 +29,7 @@ fn get_inventory_item(process: &ProcessMemory, slot: usize) -> Option<Item> {
         return None;
     }
     let inventory_address = inventory_address(process, slot);
-    let item_bytes = process.read_memory(inventory_address, 4, false);
+    let item_bytes = process.read_memory(inventory_address, 8, false);
 
     num_traits::FromPrimitive::from_f64(f64::from_le_bytes(item_bytes.try_into().unwrap()))
 }
