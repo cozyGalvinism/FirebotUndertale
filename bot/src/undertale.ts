@@ -34,6 +34,7 @@ const SetHealthEffect: Firebot.EffectType<{
         return [];
     },
     onTriggerEvent: async ({ effect }) => {
+        console.log("newHealth is a " + typeof effect.newHealth);
         await axios.post(`http://localhost:${SERVER_PORT}/setHealth`, {
             health: effect.newHealth
         });
