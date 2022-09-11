@@ -138,11 +138,20 @@ async fn test_gold() -> Result<(), ()> {
 }
 
 #[tokio::test]
-async fn test_get_equipped_weapon() -> Result<(), ()> {
+async fn test_equipped_weapon() -> Result<(), ()> {
     dotenv::dotenv().ok();
 
     let port = std::env::var("PORT").unwrap_or_else(|_| "1337".to_string());
     let client = setup();
+
+    client.post(&format!("http://localhost:{}/setEquippedWeapon", port))
+        .json(&SetEquippedWeaponRequest { equipped_weapon: 51.0 })
+        .send()
+        .await
+        .unwrap()
+        .error_for_status()
+        .unwrap();
+
     let res = client.get(&format!("http://localhost:{}/getEquippedWeapon", port))
         .send()
         .await
@@ -150,7 +159,7 @@ async fn test_get_equipped_weapon() -> Result<(), ()> {
         .json::<GetEquippedWeaponResponse>()
         .await
         .unwrap();
-    pretty_assertions::assert_eq!(res.equipped_weapon, 3.0);
+    pretty_assertions::assert_eq!(res.equipped_weapon, 51.0);
 
     Ok(())
 }
@@ -161,6 +170,15 @@ async fn test_get_equipped_armor() -> Result<(), ()> {
 
     let port = std::env::var("PORT").unwrap_or_else(|_| "1337".to_string());
     let client = setup();
+
+    client.post(&format!("http://localhost:{}/setEquippedArmor", port))
+        .json(&SetEquippedArmorRequest { equipped_armor: 50.0 })
+        .send()
+        .await
+        .unwrap()
+        .error_for_status()
+        .unwrap();
+
     let res = client.get(&format!("http://localhost:{}/getEquippedArmor", port))
         .send()
         .await
@@ -168,7 +186,7 @@ async fn test_get_equipped_armor() -> Result<(), ()> {
         .json::<GetEquippedArmorResponse>()
         .await
         .unwrap();
-    pretty_assertions::assert_eq!(res.equipped_armor, 4.0);
+    pretty_assertions::assert_eq!(res.equipped_armor, 50.0);
 
     Ok(())
 }
