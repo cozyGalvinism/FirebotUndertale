@@ -652,7 +652,7 @@ function registerEffects(runRequest: RunRequest, port: number) {
     runRequest.modules.effectManager.registerEffect(SetKillsEffect);
     runRequest.modules.effectManager.registerEffect(GetKillsEffect);
     runRequest.modules.frontendCommunicator.onAsync("get-undertale-items", async () => {
-        return items;
+        return items.items;
     });
 }
 
