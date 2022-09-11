@@ -5,7 +5,7 @@ This is a small combination of software which allows for controlling various Und
 It consists of 2 parts:
 
 1. The server
-    * Responsible for finding the Undertale process, hooking into it and performing memory editing.
+    * Responsible for finding the Undertale process, hooking into it and performing memory operations.
 2. The Firebot script
     * If you just want to control Undertale within a different bot that has HTTP capabilities, you won't need this.
     * Obviously this script heavily depends on part 1.
@@ -18,35 +18,11 @@ Right now, the script also includes an integration with Tiltify, which will be b
 
 The server contains various pointers to memory locations within Undertale, which in turn point to things like Health, Speed, the current encounter counter and more. When the server starts, it checks whether it can find a running Undertale process.
 
-Once Undertale is running, the server will start serving an API over HTTP, running on `127.0.0.1:${PORT}`. If the `PORT` env var isn't set, this will use port 1337, which might already be in use by different software (like Razer's software). Below is a small cmd script that sets the port environment variable:
+Once Undertale is running, the server will start serving an API over HTTP, running on `127.0.0.1:${PORT}`. If the `PORT` env var isn't set, this will use port 1337, which might already be in use by different software (like Razer Synapse). Below is a small cmd script that sets the port environment variable:
 
 ```bat
 SET PORT=8080
 twitch-controls-undertale.exe
 ```
 
-At this point, the following functions are implemented:
-
-* `POST /setHealth`
-  * `{"health": 10}`
-* `GET /getHealth`
-* `GET /getMaxHealth`
-* `GET /getGold`
-* `POST /setGold`
-  * `{"gold": 100}`
-* `GET /getItems`
-* `POST /fillInventory`
-  * `{"item": 29, "overwrite_important_items": false, "only_empty_slots": false}`
-* `POST /getInventory`
-  * `{"slot": 0}`
-* `POST /setEncounter`
-  * `{"counter": 9999}`
-* `GET /getSpeed`
-* `POST /setSpeed`
-  * `{"speed": 0}`
-
-All functions that run over POST need to have a request body in JSON. For items, the `/getItems` endpoint returns all item IDs with their names.
-
-The server has very little safeguards in place (like `/setHealth` will not check whether there is a save file, leading to a crash if you die during the encounter with Flowey at the start of the game). Use at your own risk!
-
-I would love if there were things like setting flags, but finding pointers to value that only change a single time is almost impossible I think. So unless somebody has a magic way of finding these infos, this server will stay pretty limited.
+For a list of HTTP functions, please look at `main.rs`. The bodies of POST requests need to be JSON and generally follow the rule of the camel-cased field name used in the `mem_value!` macro (e.g. `mem_value!(equipped_weapon, f64, EQUIPPED_WEAPON_OFFSETS, true);` will need to have the following JSON body `{"equippedWeapon": 14}`). They will also return `{"status": "ok"}` if they ran properly and either bogus or an error if they didn't. The GET responses follow the same rule and will also only return parseable data if the underlying memory operation was successful.
