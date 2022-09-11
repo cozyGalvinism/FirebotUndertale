@@ -1,7 +1,6 @@
 use reqwest::Client;
 use tput_proc::mem_value_structs;
 use serde::{Deserialize, Serialize};
-use pretty_assertions::assert_eq;
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]

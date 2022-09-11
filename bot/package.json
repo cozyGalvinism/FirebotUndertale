@@ -1,15 +1,15 @@
 {
-  "name": "TCUndertale",
+  "name": "tcundertale",
   "scriptOutputName": "TwitchControlsUndertale",
   "version": "1.0.0",
-  "description": "A starter Firebot custom script",
+  "description": "A Firebot script for controlling various Undertale-related aspects.",
   "main": "",
   "scripts": {
     "build": "webpack",
     "build:dev": "npm run build && npm run copy",
     "copy": "node ./scripts/copy-build.js"
   },
-  "author": "ebiggz",
+  "author": "cozyGalvinism",
   "license": "GNU3",
   "devDependencies": {
     "@crowbartools/firebot-custom-scripts-types": "git+https://github.com/cozyGalvinism/firebot-custom-scripts-types.git",
