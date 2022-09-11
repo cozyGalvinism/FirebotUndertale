@@ -201,6 +201,27 @@ async function fetchRewards(accountId: string, campaignId: string) {
     }
 }
 
+async function fetchCampaigns(accountId: string) {
+    try {
+        const userInfo = await axios.get(TILTIFY_BASE_URL + "user", {
+            headers: {
+                Authorization: "Bearer " + accountId,
+            }
+        });
+        const userId = userInfo.data.data.id;
+
+        const response = await axios.get(TILTIFY_BASE_URL + "users/" + userId + "/campaigns", {
+            headers: {
+                Authorization: "Bearer " + accountId,
+            }
+        });
+        return response.data.data;
+    } catch (e) {
+        console.log(e);
+        return [];
+    }
+}
+
 const RewardFilter: EventFilter = {
     id: "tcu:reward-id",
     name: "Tiltify Reward",
@@ -242,6 +263,7 @@ function register(runRequest: RunRequest) {
     runRequest.modules.eventManager.registerEventSource(eventSourceDefinition);
     runRequest.modules.eventFilterManager.registerFilter(RewardFilter);
     runRequest.modules.frontendCommunicator.fireEventAsync("integrationsUpdated", {});
+    
     runRequest.modules.frontendCommunicator.onAsync("get-tiltify-rewards", () => {
         let integration = runRequest.modules.integrationManager.getIntegrationDefinitionById("tiltify");
         if (integration == null || integration.userSettings == null || integration.userSettings.campaignSettings == null || integration.userSettings.campaignSettings.campaignId == null || integration.userSettings.campaignSettings.campaignId === "") {
@@ -251,6 +273,15 @@ function register(runRequest: RunRequest) {
         let campaignId = integration.userSettings.campaignSettings.campaignId;
 
         return fetchRewards(accountId, campaignId);
+    });
+    runRequest.modules.frontendCommunicator.onAsync("get-tiltify-campaigns", () => {
+        let integration = runRequest.modules.integrationManager.getIntegrationDefinitionById("tiltify");
+        if (integration == null || integration.accountId == null || integration.accountId === "") {
+            return Promise.reject("Tiltify integration not found or not configured");
+        }
+        let accountId = integration.accountId;
+
+        return fetchCampaigns(accountId);
     });
 
     integrationManager = runRequest.modules.integrationManager;

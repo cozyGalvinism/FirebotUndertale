@@ -1,0 +1,16 @@
+[package]
+name = "tput-proc"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+proc-macro = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+const-str = { version = "0.4.3", features = ["proc", "case"] }
+convert_case = "0.5.0"
+proc-macro2 = "1.0.43"
+quote = "1.0.21"
+syn = "1.0.99"

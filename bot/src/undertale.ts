@@ -1,6 +1,7 @@
 import { Firebot, RunRequest } from "@crowbartools/firebot-custom-scripts-types";
 import { CustomVariableManager } from "@crowbartools/firebot-custom-scripts-types/types/modules/custom-variable-manager";
 import axios from "axios";
+import items  from "./items";
 
 let SERVER_PORT: number;
 let customVarManager: CustomVariableManager;
@@ -267,6 +268,297 @@ const GetSpeedEffect: Firebot.EffectType<{
     }
 };
 
+const GetKillAreaEffect: Firebot.EffectType<{
+    variableName: string
+}> = {
+    definition: {
+        id: "tcu:get-kill-area",
+        name: "Get Kill Area",
+        description: "Gets the current kill area.",
+        icon: "fad fa-skull-crossbones",
+        categories: ["fun"]
+    },
+    optionsTemplate: `
+        <eos-container header="Kill Area Variable">
+            <input type="text" class="form-control" ng-model="effect.variableName" placeholder="killArea" replace-variables menu-position="below" />
+        </eos-container>
+    `,
+    optionsController: () => { },
+    optionsValidator: () => { return []; },
+    onTriggerEvent: async ({effect}) => {
+        const response = await axios.get(`http://localhost:${SERVER_PORT}/getKillArea`);
+
+        if (effect.variableName) {
+            customVarManager.addCustomVariable(effect.variableName, response.data.killArea);
+        }
+    }
+};
+
+const GetEquippedWeaponEffect: Firebot.EffectType<{
+    variableName: string
+}> = {
+    definition: {
+        id: "tcu:get-equipped-weapon",
+        name: "Get Equipped Weapon",
+        description: "Gets the weapon currently equipped.",
+        icon: "fad fa-sword",
+        categories: ["fun"]
+    },
+    optionsTemplate: `
+        <eos-container header="Weapon Variable">
+            <input type="text" class="form-control" ng-model="effect.variableName" placeholder="weapon" replace-variables menu-position="below" />
+        </eos-container>
+    `,
+    optionsController: () => { },
+    optionsValidator: () => { return []; },
+    onTriggerEvent: async ({effect}) => {
+        const response = await axios.get(`http://localhost:${SERVER_PORT}/getEquippedWeapon`);
+
+        if (effect.variableName) {
+            customVarManager.addCustomVariable(effect.variableName, response.data.weapon);
+        }
+    }
+};
+
+const SetEquippedWeaponEffect: Firebot.EffectType<{
+    newWeapon: number
+}> = {
+    definition: {
+        id: "tcu:set-equipped-weapon",
+        name: "Set Equipped Weapon",
+        description: "Sets the weapon currently equipped.",
+        icon: "fad fa-sword",
+        categories: ["fun"]
+    },
+    optionsTemplate: `
+        <eos-container header="New Weapon">
+            <ui-select ng-model="selectedItem" theme="bootstrap" on-select="itemSelected($item)">
+                <ui-select-match placeholder="Select an item...">
+                    <div style="height: 21px; display: flex; flex-direction: row; align-items: center;">
+                        <div style="font-weight: 100; font-size: 17px;">{{$select.selected.name}}</div>
+                    </div>
+                </ui-select-match>
+                <ui-select-choices minimum-input-length="1" repeat="item in items | filter: $select.search" style="position: relative;">
+                    <div style="height: 35px; display: flex; flex-direction: row; align-items: center;">
+                        <div style="font-weight: 100; font-size: 17px;">{{item.name}}</div>
+                    </div>
+                </ui-select-choices>
+            </ui-select>
+        </eos-container>
+    `,
+    optionsController: ($scope, $q: any, backendCommunicator: any) => {
+        $scope.selectedItem = null;
+        $scope.items = [];
+
+        $q.when(backendCommunicator.fireEventAsync("get-undertale-items"))
+            .then((items: UndertaleItem[]) => {
+                if (items) {
+                    $scope.items = items;
+                    if ($scope.effect.newWeapon) {
+                        $scope.selectedItem = ($scope.items as UndertaleItem[]).find(i => i.id === $scope.effect.newWeapon);
+                    }
+                }
+            });
+        
+        $scope.itemSelected = (item: UndertaleItem) => {
+            if (item) {
+                $scope.effect.newWeapon = item.id;
+            }
+        };
+    },
+    optionsValidator: () => { return []; },
+    onTriggerEvent: async ({effect}) => {
+        await axios.post(`http://localhost:${SERVER_PORT}/setEquippedWeapon`, {
+            weapon: effect.newWeapon
+        });
+    }
+};
+
+const GetEquippedArmorEffect: Firebot.EffectType<{
+    variableName: string
+}> = {
+    definition: {
+        id: "tcu:get-equipped-armor",
+        name: "Get Equipped Armor",
+        description: "Gets the armor currently equipped.",
+        icon: "fad fa-shield",
+        categories: ["fun"]
+    },
+    optionsTemplate: `
+        <eos-container header="Armor Variable">
+            <input type="text" class="form-control" ng-model="effect.variableName" placeholder="armor" replace-variables menu-position="below" />
+        </eos-container>
+    `,
+    optionsController: () => { },
+    optionsValidator: () => { return []; },
+    onTriggerEvent: async ({effect}) => {
+        const response = await axios.get(`http://localhost:${SERVER_PORT}/getEquippedArmor`);
+
+        if (effect.variableName) {
+            customVarManager.addCustomVariable(effect.variableName, response.data.armor);
+        }
+    }
+};
+
+const SetEquippedArmorEffect: Firebot.EffectType<{
+    newArmor: number
+}> = {
+    definition: {
+        id: "tcu:set-equipped-armor",
+        name: "Set Equipped Armor",
+        description: "Sets the armor currently equipped.",
+        icon: "fad fa-shield",
+        categories: ["fun"]
+    },
+    optionsTemplate: `
+        <eos-container header="New Armor">
+            <ui-select ng-model="selectedItem" theme="bootstrap" on-select="itemSelected($item)">
+                <ui-select-match placeholder="Select an item...">
+                    <div style="height: 21px; display: flex; flex-direction: row; align-items: center;">
+                        <div style="font-weight: 100; font-size: 17px;">{{$select.selected.name}}</div>
+                    </div>
+                </ui-select-match>
+                <ui-select-choices minimum-input-length="1" repeat="item in items | filter: $select.search" style="position: relative;">
+                    <div style="height: 35px; display: flex; flex-direction: row; align-items: center;">
+                        <div style="font-weight: 100; font-size: 17px;">{{item.name}}</div>
+                    </div>
+                </ui-select-choices>
+            </ui-select>
+        </eos-container>
+    `,
+    optionsController: ($scope, $q: any, backendCommunicator: any) => {
+        $scope.selectedItem = null;
+        $scope.items = [];
+
+        $q.when(backendCommunicator.fireEventAsync("get-undertale-items"))
+            .then((items: UndertaleItem[]) => {
+                if (items) {
+                    $scope.items = items;
+                    if ($scope.effect.newArmor) {
+                        $scope.selectedItem = ($scope.items as UndertaleItem[]).find(i => i.id === $scope.effect.newArmor);
+                    }
+                }
+            });
+
+        $scope.itemSelected = (item: UndertaleItem) => {
+            if (item) {
+                $scope.effect.newArmor = item.id;
+            }
+        };
+    },
+    optionsValidator: () => { return []; },
+    onTriggerEvent: async ({effect}) => {
+        await axios.post(`http://localhost:${SERVER_PORT}/setEquippedArmor`, {
+            armor: effect.newArmor
+        });
+    }
+};
+
+const GetKillsEffect: Firebot.EffectType<{
+    variableName: string
+}> = {
+    definition: {
+        id: "tcu:get-kills",
+        name: "Get Kills",
+        description: "Gets the number of kills in the current area (if applicable).",
+        icon: "fad fa-skull",
+        categories: ["fun"]
+    },
+    optionsTemplate: `
+        <eos-container header="Kills Variable">
+            <input type="text" class="form-control" ng-model="effect.variableName" placeholder="kills" replace-variables menu-position="below" />
+        </eos-container>
+    `,
+    optionsController: () => { },
+    optionsValidator: () => { return []; },
+    onTriggerEvent: async ({effect}) => {
+        const areaResponse = await axios.get(`http://localhost:${SERVER_PORT}/getKillArea`);
+        if (!areaResponse.data || !areaResponse.data.killArea) {
+            return;
+        }
+        const killArea = areaResponse.data.killArea as number;
+        let kills: number;
+        if (killArea == 202) {
+            // ruins
+            const response = await axios.get(`http://localhost:${SERVER_PORT}/getKillsRuins`);
+            kills = response.data.killsRuins;
+        }
+        else if (killArea == 203) {
+            // snowdin
+            const response = await axios.get(`http://localhost:${SERVER_PORT}/getKillsSnowdin`);
+            kills = response.data.killsSnowdin;
+        }
+        else if (killArea == 204) {
+            // waterfall
+            const response = await axios.get(`http://localhost:${SERVER_PORT}/getKillsWaterfall`);
+            kills = response.data.killsWaterfall;
+        }
+        else if (killArea == 205) {
+            // hotland
+            const response = await axios.get(`http://localhost:${SERVER_PORT}/getKillsHotland`);
+            kills = response.data.killsHotland;
+        }
+        else {
+            kills = 0;
+        }
+
+        if (effect.variableName) {
+            customVarManager.addCustomVariable(effect.variableName, kills);
+        }
+    }
+};
+
+const SetKillsEffect: Firebot.EffectType<{
+    newKills: number
+}> = {
+    definition: {
+        id: "tcu:set-kills",
+        name: "Set Kills",
+        description: "Sets the number of kills depending on the current area (if applicable).",
+        icon: "fad fa-skull",
+        categories: ["fun"]
+    },
+    optionsTemplate: `
+        <eos-container header="New Kills">
+            <input type="number" class="form-control" ng-model="effect.newKills" placeholder="0" />
+        </eos-container>
+    `,
+    optionsController: () => { },
+    optionsValidator: () => { return []; },
+    onTriggerEvent: async ({effect}) => {
+        const areaResponse = await axios.get(`http://localhost:${SERVER_PORT}/getKillArea`);
+        if (!areaResponse.data || !areaResponse.data.killArea) {
+            return;
+        }
+        const killArea = areaResponse.data.killArea as number;
+
+        if (killArea == 202) {
+            // ruins
+            await axios.post(`http://localhost:${SERVER_PORT}/setKillsRuins`, {
+                killsRuins: effect.newKills
+            });
+        }
+        else if (killArea == 203) {
+            // snowdin
+            await axios.post(`http://localhost:${SERVER_PORT}/setKillsSnowdin`, {
+                killsSnowdin: effect.newKills
+            });
+        }
+        else if (killArea == 204) {
+            // waterfall
+            await axios.post(`http://localhost:${SERVER_PORT}/setKillsWaterfall`, {
+                killsWaterfall: effect.newKills
+            });
+        }
+        else if (killArea == 205) {
+            // hotland
+            await axios.post(`http://localhost:${SERVER_PORT}/setKillsHotland`, {
+                killsHotland: effect.newKills
+            });
+        }
+    }
+};
+
 const FillInventoryEffect: Firebot.EffectType<{
     item: number,
     overwriteImportantItems: boolean,
@@ -351,9 +643,15 @@ function registerEffects(runRequest: RunRequest, port: number) {
     runRequest.modules.effectManager.registerEffect(SetEncounterCounterEffect);
     runRequest.modules.effectManager.registerEffect(SetSpeedEffect);
     runRequest.modules.effectManager.registerEffect(GetSpeedEffect);
+    runRequest.modules.effectManager.registerEffect(GetKillAreaEffect);
+    runRequest.modules.effectManager.registerEffect(GetEquippedWeaponEffect);
+    runRequest.modules.effectManager.registerEffect(GetEquippedArmorEffect);
+    runRequest.modules.effectManager.registerEffect(SetEquippedWeaponEffect);
+    runRequest.modules.effectManager.registerEffect(SetEquippedArmorEffect);
+    runRequest.modules.effectManager.registerEffect(SetKillsEffect);
+    runRequest.modules.effectManager.registerEffect(GetKillsEffect);
     runRequest.modules.frontendCommunicator.onAsync("get-undertale-items", async () => {
-        const response = await axios.get(`http://localhost:${port}/getItems`);
-        return response.data.items;
+        return items;
     });
 }
 

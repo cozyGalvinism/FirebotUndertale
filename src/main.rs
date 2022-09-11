@@ -1,12 +1,13 @@
-use std::{process, sync::Arc, time::Duration, ffi::CString};
+use std::{sync::Arc, time::Duration, ffi::CString};
 
 use axum::{Router, response::IntoResponse, routing::{post, get}, Extension, Json, http::StatusCode};
-use http::{SetHealthBody, ItemModel, GetItemsResponse, FillInventoryBody, DisableInputBody, GetInventoryBody, GetInventoryResponse, GetHealthResponse, GetMaxHealthResponse, GetGoldResponse, SetGoldBody, SetEncounterBody, GetSpeedResponse, SetSpeedBody};
+use http::{ItemModel, GetItemsResponse, FillInventoryBody, GetInventoryBody, GetInventoryResponse};
 use magic::*;
 use serde_json::json;
 use strum::IntoEnumIterator;
 use sysinfo::{System, SystemExt, ProcessExt, PidExt};
 use tokio::sync::Mutex;
+use tput_proc::mem_value;
 use vmemory::ProcessMemory;
 use num_traits::{ToPrimitive, FromPrimitive};
 
@@ -16,100 +17,11 @@ mod http;
 #[derive(Clone)]
 struct UndertaleGame {
     pub process: Arc<Mutex<ProcessMemory>>,
-    pub window_handle: Arc<Mutex<usize>>,
     pub ready: Arc<Mutex<bool>>,
-}
-
-fn health_address(process_memory: &ProcessMemory) -> usize {
-    CURRENT_HEALTH_OFFSETS.fetch_address(process_memory)
-}
-
-fn max_health_address(process_memory: &ProcessMemory) -> usize {
-    MAX_HEALTH_OFFSETS.fetch_address(process_memory)
 }
 
 fn inventory_address(process_memory: &ProcessMemory, slot: usize) -> usize {
     INVENTORY_OFFSETS[slot].fetch_address(process_memory)
-}
-
-fn gold_address(process_memory: &ProcessMemory) -> usize {
-    GOLD_OFFSETS.fetch_address(process_memory)
-}
-
-fn encounter_address(process_memory: &ProcessMemory) -> usize {
-    ENCOUNTER_COUNTER_OFFSETS.fetch_address(process_memory)
-}
-
-fn speed_address(process: &ProcessMemory) -> usize {
-    SPEED_OFFSETS.fetch_address(process)
-}
-
-fn equipped_weapon_address(process: &ProcessMemory) -> usize {
-    EQUIPPED_WEAPON_OFFSETS.fetch_address(process)
-}
-
-fn equipped_armor_address(process: &ProcessMemory) -> usize {
-    EQUIPPED_ARMOR_OFFSETS.fetch_address(process)
-}
-
-fn get_health(process: &ProcessMemory) -> f64 {
-    let health_address = health_address(process);
-    f64::from_le_bytes(process.read_memory(health_address, 8, false).try_into().unwrap())
-}
-
-fn set_health(process: &ProcessMemory, health: f64) {
-    let health_address = health_address(process);
-    let health_bytes = health.to_le_bytes().to_vec();
-    process.write_memory(health_address, &health_bytes, false);
-}
-
-fn get_max_health(process: &ProcessMemory) -> f64 {
-    let max_health_address = max_health_address(process);
-    f64::from_le_bytes(process.read_memory(max_health_address, 8, false).try_into().unwrap())
-}
-
-fn get_speed(process: &ProcessMemory) -> f64 {
-    let speed_address = speed_address(process);
-    f64::from_le_bytes(process.read_memory(speed_address, 8, false).try_into().unwrap())
-}
-
-fn set_speed(process: &ProcessMemory, speed: f64) {
-    let speed_address = speed_address(process);
-    let speed_bytes = speed.to_le_bytes().to_vec();
-    process.write_memory(speed_address, &speed_bytes, true);
-}
-
-fn get_gold(process: &ProcessMemory) -> f64 {
-    let gold_address = gold_address(process);
-    f64::from_le_bytes(process.read_memory(gold_address, 8, false).try_into().unwrap())
-}
-
-fn set_gold(process: &ProcessMemory, gold: f64) {
-    let gold_address = gold_address(process);
-    let gold_bytes = gold.to_le_bytes().to_vec();
-    process.write_memory(gold_address, &gold_bytes, true);
-}
-
-fn get_equipped_weapon(process: &ProcessMemory) -> f64 {
-    let equipped_weapon_address = equipped_weapon_address(process);
-    f64::from_le_bytes(process.read_memory(equipped_weapon_address, 8, false).try_into().unwrap())
-}
-
-fn set_equipped_weapon(process: &ProcessMemory, weapon: f64) {
-    let equipped_weapon_address = equipped_weapon_address(process);
-    let weapon_bytes = weapon.to_le_bytes().to_vec();
-    process.write_memory(equipped_weapon_address, &weapon_bytes, true);
-}
-
-fn get_equipped_armor(process: &ProcessMemory) -> f64 {
-    let equipped_armor_address = equipped_armor_address(process);
-    f64::from_le_bytes(process.read_memory(equipped_armor_address, 8, false).try_into().unwrap())
-}
-
-fn set_equipped_armor(process: &ProcessMemory, armor: f64) {
-    let equipped_armor_address = equipped_armor_address(process);
-    let armor_bytes = armor.to_le_bytes().to_vec();
-    process.write_memory(equipped_armor_address, &armor_bytes, true);
 }
 
 fn get_inventory_item(process: &ProcessMemory, slot: usize) -> Option<Item> {
@@ -147,59 +59,6 @@ fn fill_inventory_with(process: &ProcessMemory, item: Item, overwrite_important_
     }
 }
 
-fn set_encounter_counter(process: &ProcessMemory, counter: f64) {
-    let encounter_address = encounter_address(process);
-    let counter_bytes = counter.to_le_bytes().to_vec();
-    process.write_memory(encounter_address, &counter_bytes, true);
-}
-
-fn manage_input(handle: usize, disable: bool) {
-    unsafe {
-        let _ = winapi::um::winuser::EnableWindow(handle as winapi::shared::windef::HWND, !disable as i32);
-    };
-}
-
-async fn http_set_health(
-    process_extension: Extension<Arc<UndertaleGame>>,
-    Json(set_health_body): Json<SetHealthBody>
-) -> impl IntoResponse {
-    let process = process_extension.process.lock().await;
-    set_health(&process, set_health_body.health);
-
-    (StatusCode::OK, Json(json!({"status": "ok"}))).into_response()
-}
-
-async fn http_get_health(process_extension: Extension<Arc<UndertaleGame>>) -> impl IntoResponse {
-    let process = process_extension.process.lock().await;
-    let health = get_health(&process);
-
-    (StatusCode::OK, Json(GetHealthResponse { health })).into_response()
-}
-
-async fn http_get_max_health(process_extension: Extension<Arc<UndertaleGame>>) -> impl IntoResponse {
-    let process = process_extension.process.lock().await;
-    let max_health = get_max_health(&process);
-
-    (StatusCode::OK, Json(GetMaxHealthResponse { max_health })).into_response()
-}
-
-async fn http_get_gold(process_extension: Extension<Arc<UndertaleGame>>) -> impl IntoResponse {
-    let process = process_extension.process.lock().await;
-    let gold = get_gold(&process);
-
-    (StatusCode::OK, Json(GetGoldResponse { gold })).into_response()
-}
-
-async fn http_set_gold(
-    process_extension: Extension<Arc<UndertaleGame>>,
-    Json(set_gold_body): Json<SetGoldBody>
-) -> impl IntoResponse {
-    let process = process_extension.process.lock().await;
-    set_gold(&process, set_gold_body.gold);
-
-    (StatusCode::OK, Json(json!({"status": "ok"}))).into_response()
-}
-
 async fn http_fill_inventory(
     process_extension: Extension<Arc<UndertaleGame>>,
     Json(fill_inventory_body): Json<FillInventoryBody>
@@ -234,47 +93,8 @@ async fn http_get_inventory_at_slot(
     (StatusCode::OK, Json(GetInventoryResponse { item: inventory_item })).into_response()
 }
 
-async fn http_disable_input(process_extension: Extension<Arc<UndertaleGame>>, Json(disable_body): Json<DisableInputBody>) -> impl IntoResponse {
-    {
-        let ready_state = process_extension.ready.lock().await;
-        if !*ready_state {
-            return (StatusCode::INTERNAL_SERVER_ERROR, Json(json!({"status": "not ready"}))).into_response();
-        }
-    }
-    let window_handle = process_extension.window_handle.lock().await;
-    manage_input(*window_handle, disable_body.disable);
-
-    (StatusCode::OK, Json(json!({"status": "ok"}))).into_response()
-}
-
-async fn http_set_encounter(
-    process_extension: Extension<Arc<UndertaleGame>>,
-    Json(set_encounter_body): Json<SetEncounterBody>
-) -> impl IntoResponse {
-    let process = process_extension.process.lock().await;
-    set_encounter_counter(&process, set_encounter_body.counter);
-
-    (StatusCode::OK, Json(json!({"status": "ok"}))).into_response()
-}
-
-async fn http_get_speed(process_extension: Extension<Arc<UndertaleGame>>) -> impl IntoResponse {
-    let process = process_extension.process.lock().await;
-    let speed = get_speed(&process);
-
-    (StatusCode::OK, Json(GetSpeedResponse { speed })).into_response()
-}
-
-async fn http_set_speed(
-    process_extension: Extension<Arc<UndertaleGame>>,
-    Json(set_speed_body): Json<SetSpeedBody>
-) -> impl IntoResponse {
-    let process = process_extension.process.lock().await;
-    set_speed(&process, set_speed_body.speed);
-
-    (StatusCode::OK, Json(json!({"status": "ok"}))).into_response()
-}
-
-fn get_main_window_handle(process: u32) -> Vec<usize> {
+// Currently unused
+/* fn get_main_window_handle(process: u32) -> Vec<usize> {
     let mut window_handles = Vec::new();
     let mut handle = std::ptr::null_mut::<winapi::shared::windef::HWND__>();
     unsafe {
@@ -296,7 +116,20 @@ fn get_main_window_handle(process: u32) -> Vec<usize> {
 
     tracing::debug!("window handles: {:?}", window_handles);
     window_handles
-}
+} */
+
+mem_value!(kill_area, f64, KILL_AREA_OFFSETS, false);
+mem_value!(health, f64, CURRENT_HEALTH_OFFSETS, true);
+mem_value!(max_health, f64, MAX_HEALTH_OFFSETS, false);
+mem_value!(gold, f64, GOLD_OFFSETS, true);
+mem_value!(speed, f64, SPEED_OFFSETS, true);
+mem_value!(equipped_weapon, f64, EQUIPPED_WEAPON_OFFSETS, true);
+mem_value!(equipped_armor, f64, EQUIPPED_ARMOR_OFFSETS, true);
+mem_value!(encounter_counter, f64, ENCOUNTER_COUNTER_OFFSETS, true);
+mem_value!(kills_ruins, f64, KILLS_RUINS_OFFSETS, true);
+mem_value!(kills_snowdin, f64, KILLS_SNOWDIN_OFFSETS, true);
+mem_value!(kills_waterfall, f64, KILLS_WATERFALL_OFFSETS, true);
+mem_value!(kills_hotland, f64, KILLS_HOTLAND_OFFSETS, true);
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -307,18 +140,12 @@ async fn main() -> anyhow::Result<()> {
     let mut s = System::new_all();
 
     let mut undertale = s.processes_by_name("UNDERTALE").next();
-    let window_handle: Arc<Mutex<usize>>;
     let process: Arc<Mutex<ProcessMemory>>;
     
     if let Some(undertale) = undertale {
         tracing::info!("Attaching to Undertale process");
         let undertale_pid: u32 = undertale.pid().as_u32();
         process = Arc::new(Mutex::new(ProcessMemory::attach_process(undertale_pid).unwrap()));
-        let handles = get_main_window_handle(undertale_pid);
-        if handles.is_empty() {
-            return Err(anyhow::anyhow!("No main window found"));
-        }
-        window_handle = Arc::new(Mutex::new(handles.into_iter().next().expect("Could not find main window")));
     } else {
         tracing::info!("Undertale not running, waiting for it to start");
         loop {
@@ -338,21 +165,15 @@ async fn main() -> anyhow::Result<()> {
         let undertale = undertale.unwrap();
         let undertale_pid: u32 = undertale.pid().as_u32();
         process = Arc::new(Mutex::new(ProcessMemory::attach_process(undertale_pid).unwrap()));
-        let handles = get_main_window_handle(undertale_pid);
-        if handles.is_empty() {
-            return Err(anyhow::anyhow!("No main window found"));
-        }
-        window_handle = Arc::new(Mutex::new(handles.into_iter().next().expect("Could not find main window")));
     }
 
     let game = Arc::new(UndertaleGame {
         process,
-        window_handle: window_handle.clone(),
         ready: Arc::new(Mutex::new(true)),
     });
-    // let game_clone = game.clone();
+    let game_clone = game.clone();
 
-    /* let refresh_task = tokio::task::spawn(async move {
+    let refresh_task = tokio::task::spawn(async move {
         let game = game_clone;
 
         loop {
@@ -377,22 +198,15 @@ async fn main() -> anyhow::Result<()> {
                 let undertale = undertale.unwrap();
                 let undertale_pid: u32 = undertale.pid().as_u32();
                 let process = ProcessMemory::attach_process(undertale_pid).unwrap();
-                let window_handles = get_main_window_handle(undertale_pid);
-                if window_handles.is_empty() {
-                    continue;
-                }
-                let window_handle = window_handles.into_iter().next();
                 let mut existing_process = game.process.lock().await;
-                let mut existing_window_handle = game.window_handle.lock().await;
                 let _ = std::mem::replace(&mut *existing_process, process);
-                let _ = std::mem::replace(&mut *existing_window_handle, window_handle.expect("Could not find main window"));
                 let mut ready = game.ready.lock().await;
                 *ready = true;
             }
 
             tokio::time::sleep(Duration::from_millis(500)).await;
         }
-    }); */
+    });
 
     let app = Router::new()
         .route("/setHealth", post(http_set_health))
@@ -403,10 +217,24 @@ async fn main() -> anyhow::Result<()> {
         .route("/getItems", get(http_get_items))
         .route("/fillInventory", post(http_fill_inventory))
         .route("/getInventory", post(http_get_inventory_at_slot))
-        // .route("/disableInput", post(http_disable_input))
-        .route("/setEncounter", post(http_set_encounter))
+        .route("/getEncounter", get(http_get_encounter_counter))
+        .route("/setEncounter", post(http_set_encounter_counter))
         .route("/getSpeed", get(http_get_speed))
         .route("/setSpeed", post(http_set_speed))
+        .route("/getEquippedWeapon", get(http_get_equipped_weapon))
+        .route("/setEquippedWeapon", post(http_set_equipped_weapon))
+        .route("/getEquippedArmor", get(http_get_equipped_armor))
+        .route("/setEquippedArmor", post(http_set_equipped_armor))
+        .route("/getKillArea", get(http_get_kill_area))
+        .route("/getKillsRuins", get(http_get_kills_ruins))
+        .route("/getKillsSnowdin", get(http_get_kills_snowdin))
+        .route("/getKillsWaterfall", get(http_get_kills_waterfall))
+        .route("/getKillsHotland", get(http_get_kills_hotland))
+        .route("/setKillsRuins", post(http_set_kills_ruins))
+        .route("/setKillsSnowdin", post(http_set_kills_snowdin))
+        .route("/setKillsWaterfall", post(http_set_kills_waterfall))
+        .route("/setKillsHotland", post(http_set_kills_hotland))
+
         .layer(Extension(game));
     
     tracing::debug!("Serving on http://localhost:{}", &port);
@@ -415,7 +243,7 @@ async fn main() -> anyhow::Result<()> {
         .await?;
 
     // let mutex = window_handle.lock().await;
-    // refresh_task.abort();
+    refresh_task.abort();
     // manage_input(*mutex, false);
     Ok(())
 }
