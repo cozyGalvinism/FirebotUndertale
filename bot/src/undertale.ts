@@ -322,7 +322,7 @@ const GetEquippedWeaponEffect: Firebot.EffectType<{
 };
 
 const SetEquippedWeaponEffect: Firebot.EffectType<{
-    newWeapon: string
+    newWeapon: number
 }> = {
     definition: {
         id: "tcu:set-equipped-weapon",
@@ -356,21 +356,21 @@ const SetEquippedWeaponEffect: Firebot.EffectType<{
                 if (items) {
                     $scope.items = items;
                     if ($scope.effect.newWeapon) {
-                        $scope.selectedItem = ($scope.items as UndertaleItem[]).find(i => i.id === parseInt($scope.effect.newWeapon));
+                        $scope.selectedItem = ($scope.items as UndertaleItem[]).find(i => i.id === $scope.effect.newWeapon);
                     }
                 }
             });
         
         $scope.itemSelected = (item: UndertaleItem) => {
             if (item) {
-                $scope.effect.newWeapon = item.id.toString();
+                $scope.effect.newWeapon = item.id;
             }
         };
     },
     optionsValidator: () => { return []; },
     onTriggerEvent: async ({effect}) => {
         await axios.post(`http://localhost:${SERVER_PORT}/setEquippedWeapon`, {
-            weapon: effect.newWeapon
+            equippedWeapon: effect.newWeapon
         });
     }
 };
@@ -402,7 +402,7 @@ const GetEquippedArmorEffect: Firebot.EffectType<{
 };
 
 const SetEquippedArmorEffect: Firebot.EffectType<{
-    newArmor: string
+    newArmor: number
 }> = {
     definition: {
         id: "tcu:set-equipped-armor",
@@ -436,21 +436,21 @@ const SetEquippedArmorEffect: Firebot.EffectType<{
                 if (items) {
                     $scope.items = items;
                     if ($scope.effect.newArmor) {
-                        $scope.selectedItem = ($scope.items as UndertaleItem[]).find(i => i.id === parseInt($scope.effect.newArmor));
+                        $scope.selectedItem = ($scope.items as UndertaleItem[]).find(i => i.id === $scope.effect.newArmor);
                     }
                 }
             });
 
         $scope.itemSelected = (item: UndertaleItem) => {
             if (item) {
-                $scope.effect.newArmor = item.id.toString();
+                $scope.effect.newArmor = item.id;
             }
         };
     },
     optionsValidator: () => { return []; },
     onTriggerEvent: async ({effect}) => {
         await axios.post(`http://localhost:${SERVER_PORT}/setEquippedArmor`, {
-            armor: effect.newArmor
+            equippedArmor: effect.newArmor
         });
     }
 };
@@ -561,7 +561,7 @@ const SetKillsEffect: Firebot.EffectType<{
 };
 
 const FillInventoryEffect: Firebot.EffectType<{
-    item: string,
+    item: number,
     overwriteImportantItems: boolean,
     onlyEmptySlots: boolean
 }> = {
@@ -609,23 +609,23 @@ const FillInventoryEffect: Firebot.EffectType<{
                 if (items) {
                     $scope.items = items;
                     if ($scope.effect.item) {
-                        $scope.selectedItem = ($scope.items as UndertaleItem[]).find(i => i.id === parseInt($scope.effect.item));
+                        $scope.selectedItem = ($scope.items as UndertaleItem[]).find(i => i.id === $scope.effect.item);
                     }
                 }
             });
         
         $scope.itemSelected = (item: UndertaleItem) => {
             if (item) {
-                $scope.effect.item = item.id.toString();
+                $scope.effect.item = item.id;
             }
         };
     },
     optionsValidator: (effect) => { return []; },
     onTriggerEvent: async ({effect}) => {
         await axios.post(`http://localhost:${SERVER_PORT}/fillInventory`, {
-            item: parseInt(effect.item),
-            overwriteImportantItems: effect.overwriteImportantItems,
-            onlyEmptySlots: effect.onlyEmptySlots
+            item: effect.item,
+            overwriteImportantItems: effect.overwriteImportantItems ?? false,
+            onlyEmptySlots: effect.onlyEmptySlots ?? false
         });
     },
 };

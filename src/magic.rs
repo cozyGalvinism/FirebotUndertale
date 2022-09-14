@@ -193,7 +193,6 @@ impl Item {
                 | Item::WDagger
                 | Item::RealKnife
                 | Item::TheLocket
-                | Item::Letter
                 | Item::LetterX
                 | Item::Key
                 | Item::TemArmor
