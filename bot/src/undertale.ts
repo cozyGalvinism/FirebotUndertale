@@ -316,13 +316,13 @@ const GetEquippedWeaponEffect: Firebot.EffectType<{
         const response = await axios.get(`http://localhost:${SERVER_PORT}/getEquippedWeapon`);
 
         if (effect.variableName) {
-            customVarManager.addCustomVariable(effect.variableName, response.data.weapon);
+            customVarManager.addCustomVariable(effect.variableName, response.data.equippedWeapon);
         }
     }
 };
 
 const SetEquippedWeaponEffect: Firebot.EffectType<{
-    newWeapon: number
+    newWeapon: string
 }> = {
     definition: {
         id: "tcu:set-equipped-weapon",
@@ -333,18 +333,7 @@ const SetEquippedWeaponEffect: Firebot.EffectType<{
     },
     optionsTemplate: `
         <eos-container header="New Weapon">
-            <ui-select ng-model="selectedItem" theme="bootstrap" on-select="itemSelected($item)">
-                <ui-select-match placeholder="Select an item...">
-                    <div style="height: 21px; display: flex; flex-direction: row; align-items: center;">
-                        <div style="font-weight: 100; font-size: 17px;">{{$select.selected.name}}</div>
-                    </div>
-                </ui-select-match>
-                <ui-select-choices minimum-input-length="1" repeat="item in items | filter: $select.search" style="position: relative;">
-                    <div style="height: 35px; display: flex; flex-direction: row; align-items: center;">
-                        <div style="font-weight: 100; font-size: 17px;">{{item.name}}</div>
-                    </div>
-                </ui-select-choices>
-            </ui-select>
+            <input type="text" class="form-control" ng-model="effect.newWeapon" placeholder="0" replace-variables menu-position="below" />
         </eos-container>
     `,
     optionsController: ($scope, $q: any, backendCommunicator: any) => {
@@ -356,21 +345,21 @@ const SetEquippedWeaponEffect: Firebot.EffectType<{
                 if (items) {
                     $scope.items = items;
                     if ($scope.effect.newWeapon) {
-                        $scope.selectedItem = ($scope.items as UndertaleItem[]).find(i => i.id === $scope.effect.newWeapon);
+                        $scope.selectedItem = ($scope.items as UndertaleItem[]).find(i => i.id === parseInt($scope.effect.newWeapon));
                     }
                 }
             });
         
         $scope.itemSelected = (item: UndertaleItem) => {
             if (item) {
-                $scope.effect.newWeapon = item.id;
+                $scope.effect.newWeapon = item.id.toString();
             }
         };
     },
     optionsValidator: () => { return []; },
     onTriggerEvent: async ({effect}) => {
         await axios.post(`http://localhost:${SERVER_PORT}/setEquippedWeapon`, {
-            equippedWeapon: effect.newWeapon
+            equippedWeapon: parseInt(effect.newWeapon)
         });
     }
 };
@@ -396,13 +385,13 @@ const GetEquippedArmorEffect: Firebot.EffectType<{
         const response = await axios.get(`http://localhost:${SERVER_PORT}/getEquippedArmor`);
 
         if (effect.variableName) {
-            customVarManager.addCustomVariable(effect.variableName, response.data.armor);
+            customVarManager.addCustomVariable(effect.variableName, response.data.equippedArmor);
         }
     }
 };
 
 const SetEquippedArmorEffect: Firebot.EffectType<{
-    newArmor: number
+    newArmor: string
 }> = {
     definition: {
         id: "tcu:set-equipped-armor",
@@ -413,18 +402,7 @@ const SetEquippedArmorEffect: Firebot.EffectType<{
     },
     optionsTemplate: `
         <eos-container header="New Armor">
-            <ui-select ng-model="selectedItem" theme="bootstrap" on-select="itemSelected($item)">
-                <ui-select-match placeholder="Select an item...">
-                    <div style="height: 21px; display: flex; flex-direction: row; align-items: center;">
-                        <div style="font-weight: 100; font-size: 17px;">{{$select.selected.name}}</div>
-                    </div>
-                </ui-select-match>
-                <ui-select-choices minimum-input-length="1" repeat="item in items | filter: $select.search" style="position: relative;">
-                    <div style="height: 35px; display: flex; flex-direction: row; align-items: center;">
-                        <div style="font-weight: 100; font-size: 17px;">{{item.name}}</div>
-                    </div>
-                </ui-select-choices>
-            </ui-select>
+            <input type="text" class="form-control" ng-model="effect.newArmor" placeholder="0" replace-variables menu-position="below" />
         </eos-container>
     `,
     optionsController: ($scope, $q: any, backendCommunicator: any) => {
@@ -436,21 +414,21 @@ const SetEquippedArmorEffect: Firebot.EffectType<{
                 if (items) {
                     $scope.items = items;
                     if ($scope.effect.newArmor) {
-                        $scope.selectedItem = ($scope.items as UndertaleItem[]).find(i => i.id === $scope.effect.newArmor);
+                        $scope.selectedItem = ($scope.items as UndertaleItem[]).find(i => i.id === parseInt($scope.effect.newArmor));
                     }
                 }
             });
 
         $scope.itemSelected = (item: UndertaleItem) => {
             if (item) {
-                $scope.effect.newArmor = item.id;
+                $scope.effect.newArmor = item.id.toString();
             }
         };
     },
     optionsValidator: () => { return []; },
     onTriggerEvent: async ({effect}) => {
         await axios.post(`http://localhost:${SERVER_PORT}/setEquippedArmor`, {
-            equippedArmor: effect.newArmor
+            equippedArmor: parseInt(effect.newArmor)
         });
     }
 };

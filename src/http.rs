@@ -13,6 +13,12 @@ pub struct GetInventoryBody {
     pub slot: usize,
 }
 
+#[derive(Deserialize)]
+pub struct SetInventoryBody {
+    pub slot: usize,
+    pub item: u8,
+}
+
 #[derive(Serialize)]
 pub struct ItemModel {
     pub id: u8,

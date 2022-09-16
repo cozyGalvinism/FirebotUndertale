@@ -1,10 +1,3 @@
-// Current Health: double [[[["Undertale.exe"+00408950]+44]+10]+13C]+4B0
-// Max Health: double [[[["Undertale.exe"+00408950]+44]+10]+13C]+4A0
-// Currently in fight?: double [[[["Undertale.exe"+00408950]+44]+10]+1CC]+F0
-// Experience: double [[[[["Undertale.exe"+003F9F44]+0]+44]+10]+364]+3F0
-// Gold: double [[[[["Undertale.exe"+003F9F44]+0]+44]+10]+364]+400
-// Love: double [[[[["Undertale.exe"+003F9F44]+0]+44]+10]+364]+3E0
-// Speed: double [[[["Undertale.exe"+00408950]+44]+10]+BE0]+2B0
 // Inventory:
 // Slot 1: [[[[[[["Undertale.exe"+0040894C]+44]+10]+B20]+20]+24]+14]+0
 // Slot 2: [[[[[[["Undertale.exe"+0040894C]+44]+10]+B20]+20]+24]+14]+10
@@ -14,27 +7,12 @@
 // Slot 6: [[[[[[["Undertale.exe"+0040894C]+44]+10]+B20]+20]+24]+14]+50
 // Slot 7: [[[[[[["Undertale.exe"+0040894C]+44]+10]+B20]+20]+24]+14]+60
 // Slot 8: [[[[[[["Undertale.exe"+0040894C]+44]+10]+B20]+20]+24]+14]+70
-// Equipped Weapon: double [[[["UNDERTALE.exe"+0040894C]+44]+10]+F4]+150
-// Equipped Armor: double [[[[[[["UNDERTALE.exe"+0040861C]+0]+68]+C]+220]+14]+48]+10
-//
-// Kill Area: double [[[[[[["UNDERTALE.exe"+40894C]+44]+10]+A0]+0]+24]+4]+C80
-// Kills Ruins: double [[[[[[["UNDERTALE.exe"+40894C]+44]+10]+A0]+0]+24]+4]+CA0
-// Kills Snowdin: double [[[[[[["UNDERTALE.exe"+40894C]+44]+10]+A0]+0]+24]+4]+CB0
-// Kills Waterfall: double [[[[[[["UNDERTALE.exe"+40894C]+44]+10]+A0]+0]+24]+4]+CC0
-// Kills Hotland: double [[[[[[["UNDERTALE.exe"+40894C]+44]+10]+A0]+0]+24]+4]+CD0
 
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::{ToPrimitive, FromPrimitive};
 use serde_repr::{Serialize_repr, Deserialize_repr};
 use strum::{EnumIter, Display};
 use vmemory::ProcessMemory;
-
-// Stats
-pub const CURRENT_HEALTH_OFFSETS: [usize; 5] = [0x00408950, 0x44, 0x10, 0x13c, 0x4b0];
-pub const MAX_HEALTH_OFFSETS: [usize; 5] = [0x00408950, 0x44, 0x10, 0x13c, 0x4a0];
-pub const GOLD_OFFSETS: [usize; 6] = [0x003f9f44, 0x0, 0x44, 0x10, 0x364, 0x400];
-pub const ENCOUNTER_COUNTER_OFFSETS: [usize; 5] = [0x00408950, 0x44, 0x10, 0x13c, 0x10];
-pub const SPEED_OFFSETS: [usize; 5] = [0x00408950, 0x44, 0x10, 0xbe0, 0x2b0];
 
 // Inventory
 pub const INVENTORY_SLOT_1_OFFSETS: [usize; 8] =
@@ -53,15 +31,6 @@ pub const INVENTORY_SLOT_7_OFFSETS: [usize; 8] =
     [0x0040894c, 0x44, 0x10, 0xB20, 0x20, 0x24, 0x14, 0x60];
 pub const INVENTORY_SLOT_8_OFFSETS: [usize; 8] =
     [0x0040894c, 0x44, 0x10, 0xB20, 0x20, 0x24, 0x14, 0x70];
-pub const EQUIPPED_WEAPON_OFFSETS: [usize; 5] = [0x0040894c, 0x44, 0x10, 0xf4, 0x150];
-pub const EQUIPPED_ARMOR_OFFSETS: [usize; 8] =
-    [0x0040861c, 0x0, 0x68, 0xc, 0x220, 0x14, 0x48, 0x10];
-
-pub const KILL_AREA_OFFSETS: [usize; 8] = [0x0040894c, 0x44, 0x10, 0xa0, 0x0, 0x24, 0x4, 0xc80];
-pub const KILLS_RUINS_OFFSETS: [usize; 8] = [0x0040894c, 0x44, 0x10, 0xa0, 0x0, 0x24, 0x4, 0xca0];
-pub const KILLS_SNOWDIN_OFFSETS: [usize; 8] = [0x0040894c, 0x44, 0x10, 0xa0, 0x0, 0x24, 0x4, 0xcb0];
-pub const KILLS_WATERFALL_OFFSETS: [usize; 8] = [0x0040894c, 0x44, 0x10, 0xa0, 0x0, 0x24, 0x4, 0xcc0];
-pub const KILLS_HOTLAND_OFFSETS: [usize; 8] = [0x0040894c, 0x44, 0x10, 0xa0, 0x0, 0x24, 0x4, 0xcd0];
 
 pub const INVENTORY_OFFSETS: [&[usize; 8]; 8] = [
     &INVENTORY_SLOT_1_OFFSETS,

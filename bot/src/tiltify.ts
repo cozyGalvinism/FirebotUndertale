@@ -11,8 +11,8 @@ import { Params } from './main';
 let integrationManager: IntegrationManager;
 let db: any;
 
-// const TILTIFY_BASE_URL = "https://tiltify.com/api/v3/";
-const TILTIFY_BASE_URL = "http://127.0.0.1:3000/api/v3/";
+const TILTIFY_BASE_URL = "https://tiltify.com/api/v3/";
+// const TILTIFY_BASE_URL = "http://127.0.0.1:3000/api/v3/";
 
 const EVENT_SOURCE_ID = "tiltify";
 const EventId = {

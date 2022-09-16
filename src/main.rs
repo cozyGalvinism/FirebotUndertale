@@ -1,7 +1,7 @@
 use std::{sync::Arc, time::Duration};
 
 use axum::{Router, response::IntoResponse, routing::{post, get}, Extension, Json, http::StatusCode};
-use http::{ItemModel, GetItemsResponse, FillInventoryBody, GetInventoryBody, GetInventoryResponse};
+use http::{ItemModel, GetItemsResponse, FillInventoryBody, GetInventoryBody, GetInventoryResponse, SetInventoryBody};
 use magic::*;
 use serde_json::json;
 use strum::IntoEnumIterator;
@@ -11,24 +11,38 @@ use tput_proc::mem_value;
 use vmemory::ProcessMemory;
 use num_traits::{ToPrimitive, FromPrimitive};
 
+use crate::config::AppConfig;
+
 mod magic;
 mod http;
+mod config;
 
 #[derive(Clone)]
 struct UndertaleGame {
     pub process: Arc<Mutex<ProcessMemory>>,
     pub ready: Arc<Mutex<bool>>,
+    pub config: Arc<AppConfig>,
 }
 
-fn inventory_address(process_memory: &ProcessMemory, slot: usize) -> usize {
-    INVENTORY_OFFSETS[slot].fetch_address(process_memory)
+fn inventory_address(process_memory: &ProcessMemory, config: &AppConfig, slot: usize) -> usize {
+    match slot {
+        0 => crate::config::parse_offsets_from_ce_string(&config.addresses.inventory_slot_1).fetch_address(process_memory),
+        1 => crate::config::parse_offsets_from_ce_string(&config.addresses.inventory_slot_2).fetch_address(process_memory),
+        2 => crate::config::parse_offsets_from_ce_string(&config.addresses.inventory_slot_3).fetch_address(process_memory),
+        3 => crate::config::parse_offsets_from_ce_string(&config.addresses.inventory_slot_4).fetch_address(process_memory),
+        4 => crate::config::parse_offsets_from_ce_string(&config.addresses.inventory_slot_5).fetch_address(process_memory),
+        5 => crate::config::parse_offsets_from_ce_string(&config.addresses.inventory_slot_6).fetch_address(process_memory),
+        6 => crate::config::parse_offsets_from_ce_string(&config.addresses.inventory_slot_7).fetch_address(process_memory),
+        7 => crate::config::parse_offsets_from_ce_string(&config.addresses.inventory_slot_8).fetch_address(process_memory),
+        _ => panic!("Invalid slot number"),
+    }
 }
 
-fn get_inventory_item(process: &ProcessMemory, slot: usize) -> Option<Item> {
+fn get_inventory_item(process: &ProcessMemory, config: &AppConfig, slot: usize) -> Option<Item> {
     if slot >= INVENTORY_OFFSETS.len() {
         return None;
     }
-    let inventory_address = inventory_address(process, slot);
+    let inventory_address = inventory_address(process, config, slot);
     let item_bytes = process.read_memory(inventory_address, 8, false);
     let value = f64::from_le_bytes(item_bytes.try_into().unwrap());
     tracing::info!("Read value {} from address {:x} (get_inventory_item, slot {})", value, inventory_address, slot);
@@ -36,20 +50,20 @@ fn get_inventory_item(process: &ProcessMemory, slot: usize) -> Option<Item> {
     num_traits::FromPrimitive::from_f64(value)
 }
 
-fn set_inventory_item(process: &ProcessMemory, slot: usize, item: Item) {
+fn set_inventory_item(process: &ProcessMemory, config: &AppConfig, slot: usize, item: Item) {
     if slot >= INVENTORY_OFFSETS.len() {
         return;
     }
-    let inventory_address = inventory_address(process, slot);
+    let inventory_address = inventory_address(process, config, slot);
     let value = num_traits::ToPrimitive::to_f64(&item).unwrap();
     let item_bytes = value.to_le_bytes().to_vec();
     process.write_memory(inventory_address, &item_bytes, false);
     tracing::info!("Wrote value {} to address {:x} (set_inventory_item, slot {})", value, inventory_address, slot);
 }
 
-fn fill_inventory_with(process: &ProcessMemory, item: Item, overwrite_important_items: bool, only_empty_slots: bool) {
+fn fill_inventory_with(process: &ProcessMemory, config: &AppConfig, item: Item, overwrite_important_items: bool, only_empty_slots: bool) {
     for slot in 0..INVENTORY_OFFSETS.len() {
-        let inventory_item = get_inventory_item(process, slot);
+        let inventory_item = get_inventory_item(process, config, slot);
         if let Some(inventory_item) = inventory_item {
             if !overwrite_important_items && inventory_item.is_important_item() {
                 tracing::debug!("Not overwriting important item {}", inventory_item);
@@ -60,7 +74,7 @@ fn fill_inventory_with(process: &ProcessMemory, item: Item, overwrite_important_
                 tracing::debug!("Not overwriting non-empty slot {}", inventory_item);
                 continue;
             }
-            set_inventory_item(process, slot, item);
+            set_inventory_item(process, config, slot, item);
         } else {
             tracing::warn!("Failed to get inventory item at slot {}", slot);
         }
@@ -72,7 +86,7 @@ async fn http_fill_inventory(
     Json(fill_inventory_body): Json<FillInventoryBody>
 ) -> impl IntoResponse {
     let process_memory = process_extension.process.lock().await;
-    fill_inventory_with(&process_memory, Item::from_u8(fill_inventory_body.item).unwrap(), fill_inventory_body.overwrite_important_items, fill_inventory_body.only_empty_slots);
+    fill_inventory_with(&process_memory, &process_extension.config, Item::from_u8(fill_inventory_body.item).unwrap(), fill_inventory_body.overwrite_important_items, fill_inventory_body.only_empty_slots);
 
     (StatusCode::OK, Json(json!({"status": "ok"}))).into_response()
 }
@@ -93,12 +107,21 @@ async fn http_get_inventory_at_slot(
     Json(get_inventory_body): Json<GetInventoryBody>
 ) -> impl IntoResponse {
     let process_memory = process_extension.process.lock().await;
-    let inventory_item = get_inventory_item(&process_memory, get_inventory_body.slot);
+    let inventory_item = get_inventory_item(&process_memory, &process_extension.config, get_inventory_body.slot);
     let inventory_item = match inventory_item {
         Some(inventory_item) => inventory_item.to_u8().unwrap(),
         None => 0_u8,
     };
     (StatusCode::OK, Json(GetInventoryResponse { item: inventory_item })).into_response()
+}
+
+async fn http_set_inventory_at_slot(
+    process_extension: Extension<Arc<UndertaleGame>>,
+    Json(set_inventory_body): Json<SetInventoryBody>
+) -> impl IntoResponse {
+    let process_memory = process_extension.process.lock().await;
+    set_inventory_item(&process_memory, &process_extension.config, set_inventory_body.slot, Item::from_u8(set_inventory_body.item).unwrap());
+    (StatusCode::OK, Json(json!({"status": "ok"}))).into_response()
 }
 
 // Currently unused
@@ -126,23 +149,24 @@ async fn http_get_inventory_at_slot(
     window_handles
 } */
 
-mem_value!(kill_area, f64, KILL_AREA_OFFSETS, false);
-mem_value!(health, f64, CURRENT_HEALTH_OFFSETS, true);
-mem_value!(max_health, f64, MAX_HEALTH_OFFSETS, false);
-mem_value!(gold, f64, GOLD_OFFSETS, true);
-mem_value!(speed, f64, SPEED_OFFSETS, true);
-mem_value!(equipped_weapon, f64, EQUIPPED_WEAPON_OFFSETS, true);
-mem_value!(equipped_armor, f64, EQUIPPED_ARMOR_OFFSETS, true);
-mem_value!(encounter_counter, f64, ENCOUNTER_COUNTER_OFFSETS, true);
-mem_value!(kills_ruins, f64, KILLS_RUINS_OFFSETS, true);
-mem_value!(kills_snowdin, f64, KILLS_SNOWDIN_OFFSETS, true);
-mem_value!(kills_waterfall, f64, KILLS_WATERFALL_OFFSETS, true);
-mem_value!(kills_hotland, f64, KILLS_HOTLAND_OFFSETS, true);
+mem_value!(kill_area, f64, false);
+mem_value!(health, f64, true);
+mem_value!(max_health, f64, false);
+mem_value!(gold, f64, true);
+mem_value!(speed, f64, true);
+mem_value!(equipped_weapon, f64, true);
+mem_value!(equipped_armor, f64, true);
+mem_value!(encounter_counter, f64, true);
+mem_value!(kills_ruins, f64, true);
+mem_value!(kills_snowdin, f64, true);
+mem_value!(kills_waterfall, f64, true);
+mem_value!(kills_hotland, f64, true);
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt::init();
 
+    let config = Arc::new(AppConfig::new());
     let port = std::env::var("PORT").unwrap_or_else(|_| "1337".to_string());
 
     let mut s = System::new_all();
@@ -178,6 +202,7 @@ async fn main() -> anyhow::Result<()> {
     let game = Arc::new(UndertaleGame {
         process,
         ready: Arc::new(Mutex::new(true)),
+        config,
     });
     let game_clone = game.clone();
 
@@ -225,6 +250,7 @@ async fn main() -> anyhow::Result<()> {
         .route("/getItems", get(http_get_items))
         .route("/fillInventory", post(http_fill_inventory))
         .route("/getInventory", post(http_get_inventory_at_slot))
+        .route("/setInventory", post(http_set_inventory_at_slot))
         .route("/getEncounter", get(http_get_encounter_counter))
         .route("/setEncounter", post(http_set_encounter_counter))
         .route("/getSpeed", get(http_get_speed))
