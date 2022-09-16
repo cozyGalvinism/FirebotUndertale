@@ -608,6 +608,54 @@ const FillInventoryEffect: Firebot.EffectType<{
     },
 };
 
+const SetInventorySlotEffect: Firebot.EffectType<{
+    item: string,
+    slot: string,
+}> = {
+    definition: {
+        id: "tcu:set-inventory-slot",
+        name: "Set Inventory Slot",
+        description: "Sets an inventory slot to a specific item.",
+        icon: "fad fa-box-open",
+        categories: ["fun"]
+    },
+    optionsTemplate: `
+        <eos-container header="Item">
+            <input type="text" class="form-control" ng-model="effect.item" placeholder="0" />
+        </eos-container>
+        <eos-container header="Slot">
+            <input type="text" class="form-control" ng-model="effect.slot" placeholder="0" />
+        </eos-container>
+    `,
+    optionsController: ($scope, $q: any, backendCommunicator: any) => {
+        $scope.selectedItem = null;
+        $scope.items = [];
+
+        $q.when(backendCommunicator.fireEventAsync("get-undertale-items"))
+            .then((items: UndertaleItem[]) => {
+                if (items) {
+                    $scope.items = items;
+                    if ($scope.effect.item) {
+                        $scope.selectedItem = ($scope.items as UndertaleItem[]).find(i => i.id === parseInt($scope.effect.item));
+                    }
+                }
+            });
+        
+        $scope.itemSelected = (item: UndertaleItem) => {
+            if (item) {
+                $scope.effect.item = item.id.toString();
+            }
+        };
+    },
+    optionsValidator: () => { return []; },
+    onTriggerEvent: async ({effect}) => {
+        await axios.post(`http://localhost:${SERVER_PORT}/setInventory`, {
+            item: parseInt(effect.item),
+            slot: parseInt(effect.slot)
+        });
+    }
+};
+
 function registerEffects(runRequest: RunRequest, port: number) {
     SERVER_PORT = port;
     customVarManager = runRequest.modules.customVariableManager;
@@ -618,6 +666,7 @@ function registerEffects(runRequest: RunRequest, port: number) {
     runRequest.modules.effectManager.registerEffect(SetGoldEffect);
     runRequest.modules.effectManager.registerEffect(GetGoldEffect);
     runRequest.modules.effectManager.registerEffect(GetInventorySlotEffect);
+    runRequest.modules.effectManager.registerEffect(SetInventorySlotEffect);
     runRequest.modules.effectManager.registerEffect(FillInventoryEffect);
     runRequest.modules.effectManager.registerEffect(SetEncounterCounterEffect);
     runRequest.modules.effectManager.registerEffect(SetSpeedEffect);
