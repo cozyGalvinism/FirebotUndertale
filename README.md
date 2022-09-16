@@ -25,4 +25,6 @@ SET PORT=8080
 twitch-controls-undertale.exe
 ```
 
-For a list of HTTP functions, please look at `main.rs`. The bodies of POST requests need to be JSON and generally follow the rule of the camel-cased field name used in the `mem_value!` macro (e.g. `mem_value!(equipped_weapon, f64, EQUIPPED_WEAPON_OFFSETS, true);` will need to have the following JSON body `{"equippedWeapon": 14}`). They will also return `{"status": "ok"}` if they ran properly and either bogus or an error if they didn't. The GET responses follow the same rule and will also only return parseable data if the underlying memory operation was successful.
+Copy the `config.example.toml` to `config.toml` and you should be ready. If something doesn't work due to wrong offsets, you can change them yourself in the config. The format is pretty similar to Cheat Engine pointer syntax, though with the process name replaced with `BASE`.
+
+For a list of HTTP functions, please look at `main.rs`. The bodies of POST requests need to be JSON and generally follow the rule of the camel-cased field name used in the `mem_value!` macro (e.g. `mem_value!(equipped_weapon, f64, true);` will need to have the following JSON body `{"equippedWeapon": 14}`). They will also return `{"status": "ok"}` if they ran properly and either bogus or an error if they didn't. The GET responses follow the same rule and will also only return parseable data if the underlying memory operation was successful.
