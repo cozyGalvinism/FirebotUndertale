@@ -3,8 +3,6 @@ import { Effects, EffectTriggerResponse } from "@crowbartools/firebot-custom-scr
 import { EventManager } from "@crowbartools/firebot-custom-scripts-types/types/modules/event-manager";
 
 import axios from "axios";
-import { register as registerTiltify } from './tiltify';
-import { initFirebot } from "./firebot";
 import { registerEffects as registerUTEffects } from "./undertale";
 
 export interface Params {
@@ -42,15 +40,8 @@ const script: Firebot.CustomScript<Params> = {
   run: (runRequest) => {
     const { logger } = runRequest.modules;
 
-    initFirebot(runRequest);
-
+    logger.info("Registering Undertale effects...");
     registerUTEffects(runRequest, runRequest.parameters.backendPort);
-    registerTiltify(runRequest);
-
-    if (runRequest.parameters.debug) {
-      logger.info("Deleting last Tiltify donation ID...");
-      (runRequest.modules.JsonDb as any).push("/tiltify/lastId", null);
-    }
   },
 };
 

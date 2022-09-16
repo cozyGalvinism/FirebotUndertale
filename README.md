@@ -10,8 +10,6 @@ It consists of 2 parts:
     * If you just want to control Undertale within a different bot that has HTTP capabilities, you won't need this.
     * Obviously this script heavily depends on part 1.
 
-Right now, the script also includes an integration with Tiltify, which will be broken off into its own extension once it's ready to use.
-
 **Disclaimer:** This software only runs on Windows! Finding pointers on Linux is significantly harder and actually setting the memory also has some problems. And on top of that, there are very little crates that allow for memory editing in Rust in the first place.
 
 ## How it works
