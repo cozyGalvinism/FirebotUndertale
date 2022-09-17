@@ -71,7 +71,7 @@
       "responses": [
         {
           "uuid": "90e990f1-a90c-4061-a5ac-cd943dc71f2d",
-          "body": "{\n  \"meta\": {\n    \"status\": 200\n  },\n  \"data\": [\n    {\n      \"id\": 21347,\n      \"amount\": 4.20,\n      \"name\": \"Yoda\",\n      \"comment\": \"Judge me by my size, do you?\",\n      \"completedAt\": 1490328000000,\n      \"rewardId\": 1\n    },\n    {\n      \"id\": 21342,\n      \"amount\": 1.00,\n      \"name\": \"Me\",\n      \"comment\": \"This is an easy Game\",\n      \"completedAt\": 1490327800000\n    }\n  ],\n  \"links\": {\n    \"prev\": \"\",\n    \"next\": \"\",\n    \"self\": \"\"\n  }\n}",
+          "body": "{\n    \"meta\": {\n        \"status\": 200\n    },\n    \"data\": [\n        {\n            \"id\": 6232332,\n            \"amount\": 50.0,\n            \"name\": \"Cozy's Brother\",\n            \"comment\": \"Hype\",\n            \"completedAt\": 1663401682000,\n            \"updatedAt\": 1663401687000,\n            \"sustained\": false\n        },\n        {\n            \"id\": 6227989,\n            \"amount\": 5.0,\n            \"name\": \"venarion_\",\n            \"comment\": null,\n            \"completedAt\": 1663173833000,\n            \"updatedAt\": 1663173838000,\n            \"rewardId\": 166417,\n            \"sustained\": false\n        }\n    ],\n    \"links\": {\n        \"prev\": \"/api/v3/campaigns/457255/donations?count=10&before=6227989\",\n        \"next\": \"/api/v3/campaigns/457255/donations?count=10&after=6232360\",\n        \"self\": \"/api/v3/campaigns/457255/donations?count=10\"\n    }\n}",
           "latency": 0,
           "statusCode": 200,
           "label": "Donations",
@@ -80,11 +80,18 @@
           "sendFileAsBody": false,
           "rules": [
             {
-              "target": "request_number",
-              "modifier": "",
-              "value": "1",
+              "target": "query",
+              "modifier": "after",
+              "value": "\"\"",
               "invert": false,
               "operator": "equals"
+            },
+            {
+              "target": "query",
+              "modifier": "after",
+              "value": "",
+              "invert": false,
+              "operator": "null"
             }
           ],
           "rulesOperator": "OR",
@@ -94,7 +101,7 @@
         },
         {
           "uuid": "89d300e4-6d97-4756-add0-ceef8a6aa4b8",
-          "body": "{\n  \"meta\": {\n    \"status\": 200\n  },\n  \"data\": [],\n  \"links\": {\n    \"prev\": \"\",\n    \"next\": \"\",\n    \"self\": \"\"\n  }\n}",
+          "body": "{\n    \"meta\": {\n        \"status\": 200\n    },\n    \"data\": [\n        {\n            \"id\": 6232356,\n            \"amount\": 20.0,\n            \"name\": \"LePengui\",\n            \"comment\": \"Guess we'll be here a while\",\n            \"completedAt\": 1663403032000,\n            \"updatedAt\": 1663403038000,\n            \"rewardId\": 166126,\n            \"pollOptionId\": 43162,\n            \"challengeId\": 34835,\n            \"sustained\": false\n        }\n    ],\n    \"links\": {\n        \"prev\": \"/api/v3/campaigns/457255/donations?count=10&before=6227989\",\n        \"next\": \"/api/v3/campaigns/457255/donations?count=10&after=6232360\",\n        \"self\": \"/api/v3/campaigns/457255/donations?count=10\"\n    }\n}",
           "latency": 0,
           "statusCode": 200,
           "label": "No more donations",
@@ -103,10 +110,79 @@
           "sendFileAsBody": false,
           "rules": [
             {
-              "target": "request_number",
-              "modifier": "",
-              "value": "1",
-              "invert": true,
+              "target": "query",
+              "modifier": "after",
+              "value": "6232332",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false
+        },
+        {
+          "uuid": "1088249a-4291-4e52-b95b-23bde8dd036f",
+          "body": "{\n    \"meta\": {\n        \"status\": 200\n    },\n    \"data\": [\n        {\n            \"id\": 6232359,\n            \"amount\": 5.0,\n            \"name\": \"nexxmowarek\",\n            \"comment\": null,\n            \"completedAt\": 1663403119000,\n            \"updatedAt\": 1663403124000,\n            \"pollOptionId\": 43162,\n            \"challengeId\": 34835,\n            \"sustained\": false\n        }\n    ],\n    \"links\": {\n        \"prev\": \"/api/v3/campaigns/457255/donations?count=10&before=6227989\",\n        \"next\": \"/api/v3/campaigns/457255/donations?count=10&after=6232360\",\n        \"self\": \"/api/v3/campaigns/457255/donations?count=10\"\n    }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "query",
+              "modifier": "after",
+              "value": "6232356",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false
+        },
+        {
+          "uuid": "804fba92-897c-4670-b1f1-72854519ef82",
+          "body": "{\n    \"meta\": {\n        \"status\": 200\n    },\n    \"data\": [\n        {\n            \"id\": 6232360,\n            \"amount\": 5.0,\n            \"name\": \"Bean!\",\n            \"comment\": null,\n            \"completedAt\": 1663403138000,\n            \"updatedAt\": 1663403143000,\n            \"rewardId\": 166127,\n            \"pollOptionId\": 43162,\n            \"challengeId\": 34835,\n            \"sustained\": false\n        }\n    ],\n    \"links\": {\n        \"prev\": \"/api/v3/campaigns/457255/donations?count=10&before=6227989\",\n        \"next\": \"/api/v3/campaigns/457255/donations?count=10&after=6232360\",\n        \"self\": \"/api/v3/campaigns/457255/donations?count=10\"\n    }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "query",
+              "modifier": "after",
+              "value": "6232359",
+              "invert": false,
+              "operator": "equals"
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false
+        },
+        {
+          "uuid": "1381a0c2-8102-4ff2-a76b-a532265ed650",
+          "body": "{\n    \"meta\": {\n        \"status\": 200\n    },\n    \"data\": [\n        {\n            \"id\": 6232362,\n            \"amount\": 5.0,\n            \"name\": \"Bean!\",\n            \"comment\": null,\n            \"completedAt\": 1663403138000,\n            \"updatedAt\": 1663403143000,\n            \"rewardId\": 166127,\n            \"pollOptionId\": 43162,\n            \"challengeId\": 34835,\n            \"sustained\": false\n        }\n    ],\n    \"links\": {\n        \"prev\": \"/api/v3/campaigns/457255/donations?count=10&before=6227989\",\n        \"next\": \"/api/v3/campaigns/457255/donations?count=10&after=6232360\",\n        \"self\": \"/api/v3/campaigns/457255/donations?count=10\"\n    }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "",
+          "headers": [],
+          "filePath": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "query",
+              "modifier": "after",
+              "value": "6232361",
+              "invert": false,
               "operator": "equals"
             }
           ],

@@ -6,10 +6,12 @@ import axios from "axios";
 import { eventManager, jsonDb } from './firebot'; 
 import { RunRequest } from '@crowbartools/firebot-custom-scripts-types';
 import { Params } from './main';
+import { Logger } from '@crowbartools/firebot-custom-scripts-types/types/modules/logger';
 
 // Config(filename: string, saveOnPush?: boolean, humanReadable?: boolean, separator?: string)
 let integrationManager: IntegrationManager;
 let db: any;
+let logger: Logger;
 
 const TILTIFY_BASE_URL = "https://tiltify.com/api/v3/";
 // const TILTIFY_BASE_URL = "http://127.0.0.1:3000/api/v3/";
@@ -122,9 +124,18 @@ class TiltifyIntegration extends EventEmitter implements IntegrationController {
             var lastId: number;
             try {
                 lastId = db.getData(`/tiltify/${campaignId}/lastId`);
+                logger.debug("load: lastId", lastId);
             } catch (e) {
                 lastId = -1;
             }
+
+            let ids: any[] = [];
+            try {
+                ids = db.getData(`/tiltify/${campaignId}/ids`);
+            } catch (e) {
+                db.push(`/tiltify/${campaignId}/ids`, []);
+            }
+            logger.debug("load: ids", ids);
 
             if (lastId == -1) {
                 var response = await axios.get(TILTIFY_BASE_URL + "campaigns/" + campaignId + "/donations", {
@@ -146,18 +157,27 @@ class TiltifyIntegration extends EventEmitter implements IntegrationController {
             }
 
             const { data } = response;
-            var reversed = data.data.reverse();
+            // sort by ascending completedAt
+            var reversed = data.data.sort((a: any, b: any) => a.completedAt - b.completedAt);
 
             reversed.forEach((donation: { id: number; amount: number; name: string; comment: string; completedAt: number; rewardId?: number; }) => {
+                if (db.getData(`/tiltify/${campaignId}/ids`).includes(donation.id)) {
+                    return;
+                }
+                
                 lastId = donation.id;
 
                 eventManager.triggerEvent(EVENT_SOURCE_ID, EventId.DONATION, {
                     from: donation.name,
                     donationAmount: donation.amount,
                     rewardId: donation.rewardId,
-                });
+                }, true);
+
+                ids.push(donation.id);
+                db.push(`/tiltify/${campaignId}/ids`, ids);
             });
 
+            logger.debug("save: lastId", lastId);
             db.push(`/tiltify/${campaignId}/lastId`, lastId);
             
         }, (integrationData.userSettings.integrationSettings.pollInterval as number) * 1000);
@@ -258,6 +278,7 @@ const RewardFilter: EventFilter = {
 
 function register(runRequest: RunRequest) {
     db = new jsonDb("tiltify.json", true, false, "/");
+    logger = runRequest.modules.logger;
 
     runRequest.modules.integrationManager.registerIntegration(integration);
     runRequest.modules.eventManager.registerEventSource(eventSourceDefinition);
