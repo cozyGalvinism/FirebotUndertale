@@ -133,7 +133,7 @@ class TiltifyIntegration extends EventEmitter implements IntegrationController {
                     }
                 });
             } else {
-                var response = await axios.get(TILTIFY_BASE_URL + "campaigns/" + campaignId + "/donations&after=" + lastId, {
+                var response = await axios.get(TILTIFY_BASE_URL + "campaigns/" + campaignId + "/donations?after=" + lastId, {
                     headers: {
                         Authorization: "Bearer " + accountId,
                     }
